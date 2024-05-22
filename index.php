@@ -6,13 +6,11 @@ $page = (isset($_GET['p']) && !empty($_GET['p']) ? strtolower($_GET['p']) : fals
 ?>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-nav-layout="horizontal" data-theme-mode="dark" data-header-styles="dark" data-menu-styles="dark" data-toggled="close" loader="disable" data-page-style="modern" data-nav-style="menu-click">
+<html lang="en" dir="ltr" data-nav-layout="horizontal" data-theme-mode="light" data-header-styles="light" data-menu-styles="light" data-toggled="close" loader="disable" data-page-style="modern" data-nav-style="menu-click">
 
 <?php include('php/head.php');?>
 
 <body>
-
-    <?php //include('php/switcher.php'); ?>
 
     <!-- Loader -->
     <div id="loader" >
@@ -57,16 +55,6 @@ $page = (isset($_GET['p']) && !empty($_GET['p']) ? strtolower($_GET['p']) : fals
     <!-- Scroll To Top -->
 
     <?php include('php/scripts.php'); ?>
-    
-    <?php if($table_id) { ?>
-    <script>
-    
-        $(document).ready(() => {
-            var _table = $("#<?=$table_id?>").dataTable(configDataTable)
-        })
-        
-    </script>
-    <?php } ?>
 
 </body>
 

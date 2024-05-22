@@ -46,13 +46,6 @@ if ($page && $_SESSION["logged"]){
         
     }
 
-}else{
-
-    ?>
-            
-    <h5 class="page-title fw-semibold fs-6 mb-2 pb-2 border-bottom my-4"><i class="bi bi-info-circle"></i> Dados da Última Semana</h5>
-    
-    <?php
-
 }
+
 ?>

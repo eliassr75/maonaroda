@@ -375,68 +375,9 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                 
                 switch($_POST["query"]){
                     case "create-collab":
-                    
-                        $wallets_name = (isset($_POST["wallets_name"]) && !empty($_POST["wallets_name"]) ? $_POST["wallets_name"] : false);
-                        $wallets_type = (isset($_POST["wallets_type"]) && !empty($_POST["wallets_type"]) ? $_POST["wallets_type"] : '0');
-                        $wallets_categoria = (isset($_POST["wallets_categoria"]) && !empty($_POST["wallets_categoria"]) ? json_encode($_POST["wallets_categoria"], true) : "");
-                        $wallets_value_total = (isset($_POST["wallets_value_total"]) && !empty($_POST["wallets_value_total"]) ? $_POST["wallets_value_total"] : '0,00');
-                        $user_id = (isset($user["id"]) && !empty($user["id"]) ? intval($user["id"]) : false);
-                    
-                        $msg = criarWallet($wallets_name, $user_id, $wallets_type, $wallets_value_total, $wallets_categoria);
-                        // $msg = [$wallets_name, $user_id, $wallets_type, $wallets_value_total, $wallets_categoria];
-                                            
                         break;
-                        
-                    case "edit-collab":
-                    
-                        $wallets_id = (isset($_POST["wallets_id"]) && !empty($_POST["wallets_id"]) ? $_POST["wallets_id"] : false);
-                        $wallets_name = (isset($_POST["wallets_name"]) && !empty($_POST["wallets_name"]) ? $_POST["wallets_name"] : false);
-                        $wallets_type = (isset($_POST["wallets_type"]) && !empty($_POST["wallets_type"]) ? $_POST["wallets_type"] : '0');
-                        $wallets_categoria = (isset($_POST["wallets_categoria"]) && !empty($_POST["wallets_categoria"]) ? json_encode($_POST["wallets_categoria"], true) : "");
-                        $wallets_value_total = (isset($_POST["wallets_value_total"]) && !empty($_POST["wallets_value_total"]) ? $_POST["wallets_value_total"] : '0,00');
-                        $user_id = (isset($user["id"]) && !empty($user["id"]) ? intval($user["id"]) : false);
-                    
-                        $msg = editarWallet($wallets_id, $wallets_name, $user_id, $wallets_type, $wallets_value_total, $wallets_categoria);
-                        // $msg = [$wallets_name, $user_id, $wallets_type, $wallets_value_total, $wallets_categoria];
-                                            
+                    default:
                         break;
-                    case "add-amount":
-                    
-                        $wallets_id = (isset($_POST["wallets_id"]) && !empty($_POST["wallets_id"]) ? intval($_POST["wallets_id"]) : false);
-                        $amount = (isset($_POST["amount"]) && !empty($_POST["amount"]) ? $_POST["amount"] : false);
-                        $user_id = (isset($_POST["user_id"]) && !empty($_POST["user_id"]) ? intval($_POST["user_id"]) : false);
-                    
-                        $msg = inserirDeposito($wallets_id, $user_id, $amount);
-                        
-                        break;
-                    case 'create-payment':
-
-                        MercadoPagoConfig::setAccessToken("TEST-c684c203-f1b9-479e-9aee-5f0fb641c0b5");
-                      
-                        $client = new PreferenceClient();
-                        $request_options = new MPRequestOptions();
-      
-                        $preference = $client->create(
-                        [
-                            "items"=> array(
-                                array(
-                                  "title" => "My product",
-                                  "quantity" => 1,
-                                  "unit_price" => 2000
-                                )
-                            ),
-                            "payment_methods" => array(
-                                excluded_payment_methods => array(
-                                    'id' => 'pec',
-                                    ),
-                                excluded_payment_types => array(
-                                'id' => 'debit_card',
-                                ),
-                                installments => 1
-                            )
-                        ]);
-                        $msg = implode($payment);
-                    break;
                 }
             
             }else{

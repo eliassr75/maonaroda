@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title> WalletCollab </title>
+    <title> Mão na Roda </title>
     <meta name="Description" content="WalletCollab é uma plataforma inovadora para gerenciamento colaborativo de fundos compartilhados. Facilitamos a organização e o acompanhamento de metas financeiras compartilhadas, permitindo que grupos colaborem eficientemente para alcançar objetivos financeiros comuns. Junte-se a nós e experimente uma nova maneira de economizar e crescer juntos!">
     <meta name="Author" content="EtecSystems">
 	<meta name="keywords" content="Gerenciamento colaborativo de fundos, Economia em grupo, Finanças compartilhadas, Gestão de metas financeiras, Poupança em equipe, Colaboração financeira, Fundos comuns, Plataforma de economia compartilhada, Organização financeira em grupo, Crescimento financeiro conjunto">
