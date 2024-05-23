@@ -279,7 +279,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
             case 'get-campaigns':
                 $code = 200;
                 $msg["error"] = null;
-                $msg["data"] = get_all();
+                $msg["data"] = get_all("campaign");
                 break;
             case 'edit-collab':
                 $code = 200;
