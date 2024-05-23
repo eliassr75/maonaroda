@@ -269,7 +269,7 @@ function inserirDeposito($wallets_id, $user_id, $amount) {
 
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
-    $msg = null;
+    $msg = ["error" => "Nenhum parâmetro informado."];
     $code =  404;
 
     if (isset($_GET["query"]) && !empty($_GET["query"])){
@@ -278,10 +278,12 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
         switch($QUERY){
             case 'get-campaigns':
                 $code = 200;
-                $msg["data"] = conn();
+                $msg["error"] = null;
+                $msg["data"] = get_all();
                 break;
             case 'edit-collab':
                 $code = 200;
+
                 $msg = get_collab($_GET["id"]);
                 break;
             case "login":

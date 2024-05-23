@@ -164,6 +164,8 @@ if ($page && $_SESSION["logged"]){
 $values = counters_dashboard();
 ?>
 
+    <?php echo conn(); ?>
+
     <div class="col-12 mt-4">
         <div class="card custom-card item-card">
             <div class="card-body">
