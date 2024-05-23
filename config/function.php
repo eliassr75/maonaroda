@@ -25,11 +25,11 @@ function conn(){
  
 }
 
-function get_all() {
+function get_all($table) {
     $conn = conn();
-    // if ($conn) {
-    //     try {
-            $stmt = $conn->prepare("SELECT * FROM campaign ORDER BY id DESC");
+    if ($conn) {
+        try {
+            $stmt = $conn->prepare("SELECT * FROM $table ORDER BY id DESC");
             $stmt->execute();
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -38,12 +38,88 @@ function get_all() {
             }else{
                 return [];
             }
-    //     } catch (PDOException $e) {
-    //         return ["error" => $e->getMessage()];
-    //     }
-    // } else {
-    //     return "Nenhuma campanha encontrada.";
-    // }
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    } else {
+        return "Nenhuma campanha encontrada.";
+    }
+}
+
+function get_by_id($table) {
+    $conn = conn();
+
+    if ($conn) {
+        try {
+            $stmt = $conn->prepare("SELECT * FROM $table where id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($rows){
+                return $rows;
+            }else{
+                return [];
+            }
+        } catch (PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    }else{
+        return "Não foi possível obter essa informação";
+    }
+}
+
+function get_campaign_by_id() {
+    $conn = conn();
+
+    if ($conn) {
+        try {
+            $stmt = $conn->prepare("SELECT campaign.*, entity.* FROM campaigns JOIN entity ON entity.id = campaign.entity_id WHERE campaign.id = :id ORDER BY campaign.id DESC");
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($rows) {
+                return $rows;
+            } else {
+                return [];
+            }
+        } catch(PDOException $e) {
+            return ["error" => $e->getMessage()];
+        }
+    } else {
+        return "Nenhuma campanha encontrada.";
+    }
+}
+
+function create_campaign($data) {
+    $conn = conn();
+    
+    if ($conn) {
+        $name = (isset($data["name"]) ? $data["name"] : "");
+        $description = (isset($data["description"]) ? $data["description"] : "");
+        $value = (isset($data["value"]) ? $data["value"] : "");
+        $created_by = (isset($data["created_by"]) ? $data["created_by"] : "");
+        $entity_id = (isset($data["entity_id"]) ? $data["entity_id"] : "");
+        $local = (isset($data["local"]) ? $data["local"] : "");
+        $active = (isset($data["active"]) ? $data["active"] : "");
+        if (empty($name)) {
+            return ["error" => "Nome da campanha é obrigatório."];
+        }
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO campaign (name, description, value, created_by, entity_id, local, active) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $description, $value, $created_by, $entity_id, $local, $active]);
+            
+            $last_id = $conn->lastInsertId();
+            
+            return ["success" => true, "id" => $last_id];
+        } catch (PDOException $e) {
+            return ["error" => "Falha ao criar campanha: " . $e->getMessage()];
+        }
+    } else {
+        return ["error" => "Falha ao conectar com o banco."];
+    }
 }
 
 function counters_dashboard(){
