@@ -25,6 +25,27 @@ function conn(){
  
 }
 
+function get_all() {
+    $conn = conn();
+    // if ($conn) {
+    //     try {
+            $stmt = $conn->prepare("SELECT * FROM campaign ORDER BY id DESC");
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            if ($rows){
+                return $rows;
+            }else{
+                return [];
+            }
+    //     } catch (PDOException $e) {
+    //         return ["error" => $e->getMessage()];
+    //     }
+    // } else {
+    //     return "Nenhuma campanha encontrada.";
+    // }
+}
+
 function counters_dashboard(){
     
     $values = [
