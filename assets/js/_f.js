@@ -734,9 +734,7 @@ function body_modal(ref, params){
             })
             
         });
-            
-        
-        
+
         
     }).catch(function(error) {
         console.error("Erro ao verificar o status de login:", error);
@@ -754,5 +752,9 @@ $(document).ready(() => {
     //         preferenceId: "wallet_containers",
     //     },
     // });
+
+    $(".select2").select2({
+        placeholder: "Cidades participantes",
+    });
 
 })
