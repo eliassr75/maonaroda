@@ -161,49 +161,38 @@ if ($page && $_SESSION["logged"]){
     <?php
 }else{
 
-$values = counters_dashboard();
+$campaigns = get_all('campaign', true);
 ?>
 
-    <?php echo conn(); ?>
-
-    <div class="col-12 mt-4">
+    <div class="ms-auto col-md-8 mt-4 me-auto">
         <div class="card custom-card item-card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group mb-0 my-1">
-                            <select class="form-control select2">
-                                <option>
-                                -- Sort By --
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4 text-center d-none d-xxl-block">
+                    <div class="ms-auto col-md-8 text-center me-auto">
                         <select class="form-control select2">
-                            <option>
-                                -- Sort By --
-                            </option>
+                            <option></option>
+                            <?php
+                                $citys = [];
+                                foreach ($campaigns as $campaign) {
+                                    if (!in_array($campaign['local'], $citys)) {
+                                        $citys[] = $campaign['local'] . " ({$campaign['total']}) ";
+                                    }
+                                }
+                            ?>
+                            <?php foreach ($citys as $city) { ?>
+                                <option value="<?=$city?>"><?=$city?></option>
+                            <?php } ?>
                         </select>
-                    </div>
-                    <div class="col-md-4 text-center d-none d-xxl-block">
-                        <select class="form-control select2">
-                            <option>
-                                -- Sort By --
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-xl">
-                        <div class="input-group my-1">
-                            <input type="text" class="form-control" placeholder="Search ...">
-                            <button type="button" class="input-group-text btn btn-primary text-fixed-white">Search</button>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="col-12 mt-4">
         <div class="row products-main">
             <div class="col-12 col-md-6 col-sm-6 col-lg-6 col-xxl-3 product-each">
+
+                <?php foreach ($campaigns as $campaign) { ?>
                 <div class="card custom-card item-card">
                     <div class="product-grid6 card-body p-0">
                         <div class="product-image6">
@@ -238,18 +227,8 @@ $values = counters_dashboard();
                         <div class="product-content w-100 p-3">
                             <div class="mb-2">
                                 <h6 class="mb-1 fs-16 text-normal fw-normal"><a href="javascript:void(0);">Multi Colour Flower Pot Set</a></h6>
-                                <p class="mb-0 text-muted text-start">brand name</p>
                             </div>
-                            <p class="mb-2 text-warning">
-                                                <span class="align-middle">
-                                                    <i class="ri-star-fill"></i>
-                                                    <i class="ri-star-fill"></i>
-                                                    <i class="ri-star-fill"></i>
-                                                    <i class="ri-star-fill"></i>
-                                                    <i class="ri-star-half-line"></i>
-                                                </span>
-                                <span class="ms-2">(4.5)</span>
-                            </p>
+
                             <div class="d-flex align-items-center justify-content-between">
                                 <p class="mb-0">
                                     <span class="fs-20">$200</span>
@@ -260,9 +239,9 @@ $values = counters_dashboard();
                         </div>
                     </div>
                 </div>
+                <?php } ?>
             </div>
         </div>
-
     </div>
 
 <?php

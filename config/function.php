@@ -25,11 +25,18 @@ function conn(){
  
 }
 
-function get_all($table) {
+function get_all($table, $total=false, $key=null, $value=null) {
     $conn = conn();
     if ($conn) {
         try {
-            $stmt = $conn->prepare("SELECT * FROM $table ORDER BY id DESC");
+
+            if ($total) {
+                $total = ", (SELECT COUNT(id) from $table) as total";
+            }else{
+                $total=null;
+            }
+
+            $stmt = $conn->prepare("SELECT $table.* $total FROM $table ORDER BY id DESC");
             $stmt->execute();
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
