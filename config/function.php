@@ -53,7 +53,7 @@ function get_all($table, $total=false, $key=null, $value=null) {
     }
 }
 
-function get_by_id($table) {
+function get_by_id($table, $id) {
     $conn = conn();
 
     if ($conn) {
@@ -61,7 +61,7 @@ function get_by_id($table) {
             $stmt = $conn->prepare("SELECT * FROM $table where id = :id");
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
             $stmt->execute();
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($rows){
                 return $rows;
@@ -76,7 +76,7 @@ function get_by_id($table) {
     }
 }
 
-function get_campaign_by_id() {
+function get_campaign_by_id($id) {
     $conn = conn();
 
     if ($conn) {
@@ -84,7 +84,7 @@ function get_campaign_by_id() {
             $stmt = $conn->prepare("SELECT campaign.*, entity.* FROM campaigns JOIN entity ON entity.id = campaign.entity_id WHERE campaign.id = :id ORDER BY campaign.id DESC");
             $stmt->bindParam(':id', $id, PDO::PARAM_STR);
             $stmt->execute();
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($rows) {
                 return $rows;
@@ -123,6 +123,64 @@ function create_campaign($data) {
             return ["success" => true, "id" => $last_id];
         } catch (PDOException $e) {
             return ["error" => "Falha ao criar campanha: " . $e->getMessage()];
+        }
+    } else {
+        return ["error" => "Falha ao conectar com o banco."];
+    }
+}
+
+function create_entity($data) {
+    $conn = conn();
+
+    if($conn) {
+        $name = (isset($data["name"]) ? $data["name"] : "");
+        $document = (isset($data["document"]) ? $data["document"] : "");
+        $photo = (isset($data["photo"]) ? $data["photo"] : "");
+        $active = (isset($data["active"]) ? $data["active"] : "");
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO entity (name, document, photo, active) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$name, $document, $photo, $active]);
+
+            $last_id = $conn->lastInsertId();
+
+            return ["success" => true, "id" => $last_id];
+        } catch (PDOException $e) {
+            return ["error" => "Falha ao criar entidade: " . $e->getMessage()];
+        } 
+    } else {
+        return ["error" => "Falha ao conectar com o banco."];
+    }
+}
+
+function create_user($data) {
+    $conn = conn();
+
+    if($conn) {
+        $name = (isset($data["name"]) ? $data["name"] : "");
+        $email = (isset($data["email"]) ? $data["email"] : "");
+        $username = (isset($data["username"]) ? $data["username"] : "");
+        $password = (isset($data["password"]) ? $data["password"] : "");
+        $city = (isset($data["city"]) ? $data["city"] : "");
+        $state = (isset($data["state"]) ? $data["state"] : "");
+        $country = (isset($data["country"]) ? $data["country"] : "");
+        $postcode = (isset($data["postcode"]) ? $data["postcode"] : "");
+        $gender = (isset($data["gender"]) ? $data["gender"] : "");
+        $phone = (isset($data["phone"]) ? $data["phone"] : "");
+        $ddi_phone = (isset($data["ddi_phone"]) ? $data["ddi_phone"] : "");
+        $country_phone = (isset($data["country_phone"]) ? $data["country_phone"] : "");
+        $token = (isset($data["token"]) ? $data["token"] : "");
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO entity (name, email, username, password, city, state, country, postcode,
+                                                        gender, phone, ddi_phone, country_phone, token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $email, $username, $password, $city, $state, $country, $postcode, $gender, $phone, $ddi_phone, $country_phone, $token]);
+
+            $last_id = $conn->lastInsertId();
+
+            return ["success" => true, "id" => $last_id];
+        } catch(PDOException $e) {
+            return ["error" => "Falha ao criar usuário: " . $e->getMessage()];
         }
     } else {
         return ["error" => "Falha ao conectar com o banco."];
