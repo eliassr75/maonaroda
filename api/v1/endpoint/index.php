@@ -4,64 +4,6 @@ require_once("../../../config/cors.php");
 require_once("../../../config/function.php");
 require __DIR__ . '/vendor/autoload.php';
 
-use GuzzleHttp\Client;
-use MercadoPago\Client\Payment\PreferenceClient;
-use MercadoPago\MercadoPagoConfig;
-
-use Detection\MobileDetect;
-
-function sendPaymentRequest($requestData, $method) {
-
-    $client = new Client();
-    
-    /*
-    
-    $requestData = [
-        'credentials' => [
-            'login' => $this->login,
-            'password' => $this->password,
-            'token' => $this->token,
-        ],
-        'method' => '--',
-        'values' => [
-            'id' => $bill,
-        ],
-    ];
-    
-    
-    */
-    
-    switch ($method) {
-    
-        case "GET":
-            $response = $client->get($this->apiUrl, [
-                'headers' => ['Content-Type' => 'application/json'],
-                'body' => json_encode($requestData),
-            ]);
-            break;
-        case "POST":
-            $response = $client->post($this->apiUrl, [
-                'headers' => ['Content-Type' => 'application/json'],
-                'body' => json_encode($requestData),
-            ]);
-            break;
-        case "PUT":
-            $response = $client->put($this->apiUrl, [
-                'headers' => ['Content-Type' => 'application/json'],
-                'body' => json_encode($requestData),
-            ]);
-            break;
-        case "DELETE":
-            $response = $client->delete($this->apiUrl, [
-                'headers' => ['Content-Type' => 'application/json'],
-                'body' => json_encode($requestData),
-            ]);
-            break;
-    }
-
-    return json_decode($response->getBody(), true);
-}
-
 function auto_decimal_format($n, $def = 2) {
     
     $a = explode(".", $n);
@@ -380,7 +322,13 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $code = false;
                 
                 switch($_POST["query"]){
-                    case "create-collab":
+                    case "new-login":
+
+                        $name = $_POST['name'];
+                        $email = $_POST['username'];
+                        $username = explode($_POST['username'], "@")[0];
+                        $password = md5($_POST['password'];
+
                         break;
                     default:
                         break;
@@ -391,7 +339,18 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
             
         }else{
-            $msg["error"] = "O token é obrigatório!";
+            switch($_POST["query"]){
+                case "new-login":
+
+                    $email = $_POST['username'];
+                    $username = explode($_POST['username'], "@")[0];
+                    $password = md5($_POST['password'];)
+
+                    break;
+                default:
+                    $msg = ["error" => "Requisição não permitida."];
+                    break;
+            }
         }
         
     }

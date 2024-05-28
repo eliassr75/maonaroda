@@ -228,7 +228,6 @@ function auto_remove_alert(){
     }, 5000)
 }
 
-// const mp = new MercadoPago('TEST-c684c203-f1b9-479e-9aee-5f0fb641c0b5');
 function body_modal(ref, params){
 
     $(".modal-content").html(`
@@ -250,8 +249,10 @@ function body_modal(ref, params){
         
         let method = ""
         let url_api = ""
+
+        const allowed_mods = ["password-reset", "new-login"]
         
-        if (!logged){
+        if (!logged || !allowed_mods.includes(ref)){
             ref = ""
         }
         
@@ -318,6 +319,10 @@ function body_modal(ref, params){
                             <div class="authentication authentication-basic">
                                 <div class="custom-alert"></div>
                                 <div class="card-body">
+                                    <div class="input-box mb-3" data-bs-validate="Valid name is required: Lucas Souza">
+                                        <input type="email" class="form-control form-control-lg" id="name" name="name" placeholder="Lucas Sousa" required>
+                                        <span class="authentication-input-icon"><i class="ri-user-fill text-default fs-15 op-7"></i></span>
+                                    </div>
                                     <div class="input-box mb-3" data-bs-validate="Valid email is required: ex@abc.xyz">
                                         <input type="email" class="form-control form-control-lg" id="username" name="username" placeholder="email@email.com" required>
                                         <span class="authentication-input-icon"><i class="ri-mail-fill text-default fs-15 op-7"></i></span>
