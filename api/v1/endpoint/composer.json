@@ -3,6 +3,7 @@
         "mercadopago/dx-php": "^3.0",
         "guzzlehttp/guzzle": "^7.0",
         "mobiledetect/mobiledetectlib": "^4.8",
-        "jenssegers/agent": "^2.1"
+        "jenssegers/agent": "^2.1",
+        "phpmailer/phpmailer": "^6.9"
     }
 }

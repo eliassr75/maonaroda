@@ -1,6 +1,6 @@
 const api = {
-    internal: "http://localhost:61520/api/v1/endpoint/",
-    external: "http://localhost:61520/api/aplication/endpoint/"
+    internal: "/api/v1/endpoint/",
+    external: "/api/aplication/endpoint/"
 }
 
 const configDataTable = {
@@ -24,143 +24,32 @@ const configDataTable = {
     }
 }
 
-const types_collabs = [
 
-    {
-    title: "Pessoal",
-    desc: "Para despesas pessoais do dia a dia, como contas, transporte, lazer, alimentação, entre outros."
-    },
-    {
-    title: "Familiar",
-    desc: "Para despesas compartilhadas por membros da família, como moradia, alimentação, educação, cuidados médicos, entre outros."
-    },
-    {
-    title: "Viagem",
-    desc: "Para economizar dinheiro para viagens, incluindo passagens, hospedagem, alimentação, transporte local e atividades turísticas."
-    },
-    {
-    title: "Eventos Especiais",
-    desc: "Para economizar para eventos especiais, como casamentos, festas de aniversário, formaturas, férias, entre outros."
-    },
-    {
-    title: "Objetivos Financeiros",
-    desc: "Para atingir objetivos financeiros específicos, como comprar um carro, fazer uma reforma em casa, pagar uma dívida, investir em educação, entre outros."
-    },
-    {
-    title: "Emergências",
-    desc: "Para situações de emergência ou imprevistos, como despesas médicas inesperadas, reparos de emergência, perda de emprego, entre outros."
-    },
-    {
-    title: "Educação",
-    desc: "Para despesas relacionadas à educação, como mensalidades escolares, materiais didáticos, cursos extracurriculares, entre outros."
-    },
-    {
-    title: "Saúde e Bem-Estar",
-    desc: "Para despesas relacionadas à saúde e bem-estar, como consultas médicas, medicamentos, seguros de saúde, academia, entre outros."
-    },
-    {
-    title: "Doações e Caridade",
-    desc: "Para contribuições financeiras a causas sociais, instituições de caridade, projetos comunitários, entre outros."
-    },
-    {
-    title: "Investimentos",
-    desc: "Para investimentos financeiros, como ações, fundos mútuos, imóveis, previdência privada, entre outros."
-    },
-    {
-    title: "Entretenimento",
-    desc: "Para despesas relacionadas a entretenimento, como cinema, teatro, shows, eventos esportivos, assinaturas de streaming, entre outros."
-    },
-    {
-    title: "Moda e Beleza",
-    desc: "Para despesas relacionadas a roupas, acessórios, produtos de beleza, salão de beleza, cosméticos, entre outros."
-    },
-    {
-    title: "Tecnologia",
-    desc: "Para despesas relacionadas a eletrônicos, gadgets, dispositivos móveis, assinaturas de serviços digitais, entre outros."
-    },
-    {
-    title: "Automóveis",
-    desc: "Para despesas relacionadas a veículos, como combustível, seguro auto, manutenção, estacionamento, multas, entre outros."
-    },
-    {
-    title: "Hobbies e Passatempos",
-    desc: "Para despesas relacionadas a hobbies e passatempos, como livros, música, artesanato, esportes, colecionáveis, entre outros."
-    },
-    {
-    title: "Pets",
-    desc: "Para despesas relacionadas a animais de estimação, como alimentação, cuidados veterinários, produtos de higiene, brinquedos, entre outros."
-    },
-    {
-    title: "Presentes e Celebrações",
-    desc: "Para despesas relacionadas a presentes para amigos e familiares, festas de aniversário, celebrações de feriados, entre outros."
-    },
-    {
-    title: "Home Office",
-    desc: "Para despesas relacionadas a um escritório em casa, como mobília, equipamentos de escritório, suprimentos de papelaria, entre outros."
-    },
-    {
-    title: "Sustentabilidade",
-    desc: "Para despesas relacionadas a práticas sustentáveis, como reciclagem, energia renovável, produtos eco-friendly, entre outros."
-    },
-    {
-    title: "Aposentadoria",
-    desc: "Para economizar dinheiro para aposentadoria, incluindo planos de previdência privada, investimentos de longo prazo, entre outros."
-    },
-    {
-    title: "Aluguel e Moradia",
-    desc: "Para despesas relacionadas a aluguel ou financiamento de moradia, incluindo aluguel, hipoteca, condomínio, contas de serviços públicos, entre outros."
-    },
-    {
-    title: "Alimentação e Supermercado",
-    desc: "Para despesas relacionadas a alimentos, compras de supermercado, refeições fora de casa, delivery, entre outros."
-    },
-    {
-    title: "Impostos e Taxas",
-    desc: "Para economizar dinheiro para pagar impostos, taxas, contribuições, multas, entre outros encargos fiscais."
-    },
-    {
-    title: "Viagens a Negócios",
-    desc: "Para despesas relacionadas a viagens de negócios, como hospedagem, transporte, alimentação, despesas de representação, entre outros."
-    },
-    {
-    title: "Treinamento e Desenvolvimento Profissional",
-    desc: "Para despesas relacionadas a treinamentos, cursos, workshops, livros, certificações, eventos profissionais, entre outros."
-    },
-    {
-    title: "Segurança e Proteção",
-    desc: "Para despesas relacionadas a segurança pessoal, proteção de bens, seguros de vida, seguro residencial, entre outros."
-    },
-    {
-    title: "Aventuras e Experiências",
-    desc: "Para despesas relacionadas a atividades ao ar livre, viagens de aventura, ingressos para parques temáticos, entre outros."
-    },
-    {
-    title: "Investimentos Sociais",
-    desc: "Para investimentos em projetos sociais, impacto social, responsabilidade social corporativa, entre outros."
-    },
-    {
-    title: "Arte e Cultura",
-    desc: "Para despesas relacionadas a arte, cultura, museus, galerias de arte, eventos culturais, entre outros."
-    },
-    {
-    title: "Desenvolvimento Comunitário",
-    desc: "Para despesas relacionadas a projetos comunitários, doações locais, apoio a iniciativas sociais, entre outros."
+async function getEstados() {
+    const response = await fetch('https://brasilapi.com.br/api/ibge/uf/v1');
+    const estados = await response.json();
+    return estados;
+}
+
+// Função para obter a lista de cidades de um estado
+async function getCidades(estadoSigla) {
+    const response = await fetch(`https://brasilapi.com.br/api/ibge/municipios/v1/${estadoSigla}`);
+    const cidades = await response.json();
+    return cidades;
+}
+
+// Função para obter estados e suas cidades
+async function getEstadosECidades() {
+    const estados = await getEstados();
+    const estadosECidades = {};
+
+    for (const estado of estados) {
+        const cidades = await getCidades(estado.sigla);
+        estadosECidades[estado.nome] = cidades.map(cidade => cidade.nome);
     }
 
-]
-
-types_collabs.sort((a, b) => {
-    const titleA = a.title.toUpperCase();
-    const titleB = b.title.toUpperCase();
-
-    if (titleA < titleB) {
-        return -1;
-    }
-    if (titleA > titleB) {
-        return 1;
-    }
-    return 0;
-});
+    return estadosECidades;
+}
 
 function createpassword (type, ele) {
     document.getElementById(type).type = document.getElementById(type).type == "password" ? "text" : "password"
@@ -214,7 +103,7 @@ function _alert(msg, type, _spinner=false){
         </button>
     </div>
     
-    `).addClass("my-3")
+    `).addClass("my-3").show(300)
     
     if (_spinner){
         spinner("#spinner")
@@ -222,10 +111,30 @@ function _alert(msg, type, _spinner=false){
     
 }
 
-function auto_remove_alert(){
+function auto_remove_alert(timeout=5000){
     setTimeout(() => {
         $(".custom-alert").html(``).hide(300)
-    }, 5000)
+    }, timeout)
+}
+
+function checkPassword(){
+
+    const password = $("#password").val()
+    const new_password = $("#confirm-password").val()
+
+    if (password == new_password) {
+
+        if(password.length >= 8 && new_password.length >= 8) {
+            $('.btn-submit').attr("disabled", false)
+            auto_remove_alert(0)
+        }else{
+            _alert("A deve ter no mínimo 8 caracteres!", "danger")
+        }
+
+    } else {
+        _alert("As senhas não coincidem!", "danger")
+        $('.btn-submit').attr("disabled", true)
+    }
 }
 
 function body_modal(ref, params){
@@ -252,7 +161,7 @@ function body_modal(ref, params){
 
         const allowed_mods = ["password-reset", "new-login"]
         
-        if (!logged || !allowed_mods.includes(ref)){
+        if (!logged && !allowed_mods.includes(ref)){
             ref = ""
         }
         
@@ -320,7 +229,7 @@ function body_modal(ref, params){
                                 <div class="custom-alert"></div>
                                 <div class="card-body">
                                     <div class="input-box mb-3" data-bs-validate="Valid name is required: Lucas Souza">
-                                        <input type="email" class="form-control form-control-lg" id="name" name="name" placeholder="Lucas Sousa" required>
+                                        <input type="text" class="form-control form-control-lg" id="name" name="name" minlength="10" placeholder="Lucas Sousa" required>
                                         <span class="authentication-input-icon"><i class="ri-user-fill text-default fs-15 op-7"></i></span>
                                     </div>
                                     <div class="input-box mb-3" data-bs-validate="Valid email is required: ex@abc.xyz">
@@ -328,12 +237,12 @@ function body_modal(ref, params){
                                         <span class="authentication-input-icon"><i class="ri-mail-fill text-default fs-15 op-7"></i></span>
                                     </div>
                                     <div class="input-group input-box mb-3">
-                                        <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="password" required>
+                                        <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="password" name="password" maxlength="8" placeholder="password" required>
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
                                         <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
                                     <div class="input-group input-box mb-3">
-                                        <input type="password" class="form-control form-control-lg" id="confirm-password" name="confirm-password" placeholder="Confirme a senha" required>
+                                        <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="confirm-password" name="confirm-password" maxlength="8" autocomplete="new-password" placeholder="Confirme a senha" required>
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
                                         <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('confirm-password',this)" id="button-addon3"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
@@ -343,7 +252,7 @@ function body_modal(ref, params){
                                     </div>
                                     <hr>
                                     <div class="text-center">
-                                        <a href="javascript:void(0);" class="btn btn btn-primary-light" onclick="body_modal('login', {})">
+                                        <a href="javascript:void(0);" class="btn btn-lg btm-w-lg btn-primary-light " onclick="body_modal('login', {})">
                                         <i class="bi bi-arrow-left-circle"></i> Voltar
                                         </a>
                                     </div>
@@ -356,50 +265,40 @@ function body_modal(ref, params){
                 `)
                 
                 break;
-            case 'collab':
+            case 'campaign':
             
                 method = "POST"
                 url_api = api.internal
-                let values_select = ""
-                
-                if (params.form == "edit-collab"){
-                    types_collabs.forEach((e, i) => {
-                        values_select += `<option value="${e.title}" ${params.category.includes(e.title) ? "selected" : ""}>${e.title}</option>`
-                    })
-                }else{
-                    types_collabs.forEach((e, i) => {
-                        values_select += `<option value="${e.title}">${e.title}</option>`
-                    })
-                }
-                
-                $(".modal-content").html(`
+
+                getEstadosECidades().then(estadosECidades => {
+                    // Iterar sobre o objeto estadosECidades para acessar chaves e valores
+                    for (const [estado, cidades] of Object.entries(estadosECidades)) {
+                        console.log(`Estado: ${estado}`);
+                        console.log(`Cidades: ${cidades.join(', ')}`);
+                    }
+
+                    $(".modal-content").html(`
         
-                    <form id="new-collab" name="new-collab">
+                    <form id="new-campaign" name="new-campaign">
                         <input type="hidden" name="query" value="${params.form}"/>
-                        ${params.form == "edit-collab" ? `<input type="hidden" name="wallets_id" value="${params.id}"/>` : ""}
+                        ${params.form == "edit-campaign" ? `<input type="hidden" name="campaign_id" value="${params.id}"/>` : ""}
                         <div class="modal-header">
                             <h6 class="modal-title">
-                                <i class="bi bi-wallet2"></i> ${params.form == "edit-collab" ? "Editar Collab":"Nova Collab"}
+                                <i class="bi bi-wallet2"></i> ${params.form == "edit-campaign" ? "Editar Campanha":"Nova Campanha"}
                             </h6>
                             <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body text-start">
                             <div class="custom-alert"></div>
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="collab-input-name" name="wallets_name" placeholder="Nome da Collab" required>
-                                <label for="collab-input-name">Nome da Collab</label>
+                                <input type="text" class="form-control" id="input-campaing-name" name="campaing-name" placeholder="Nome da Campanha" required>
+                                <label for="input-campaing-name">Nome da Campanha</label>
                             </div>
                             <hr>
                             <div class="form-check my-2">
-                                <input class="form-check-input" type="radio" name="wallets_mod" id="collab-input-mod-1" value="0" required checked>
-                                <label class="form-check-label" for="collab-input-mod-1">
-                                    Acumulativa
-                                </label>
-                            </div>
-                            <div class="form-check my-2">
-                                <input class="form-check-input" type="radio" name="wallets_mod" id="collab-input-mod-2" value="1" required>
-                                <label class="form-check-label" for="collab-input-mod-2">
-                                    Progressiva
+                                <input class="form-check-input" type="checkbox" name="input-campaign-mod" id="input-campaign-mod">
+                                <label class="form-check-label" for="input-campaign-mod">
+                                    Especificar Valor (R$)
                                 </label>
                             </div>
                             
@@ -408,8 +307,8 @@ function body_modal(ref, params){
                                     <span class="input-group-text">R$</span>
                                     <div class="form-floating">
                                         <div class="form-floating">
-                                            <input type="tel" class="form-control br-money" id="collab-input-total-value" name="wallets_value_total" placeholder="Valor total da Collab" readonly value="0">
-                                            <label for="collab-input-total-value">Valor total da Collab</label>
+                                            <input type="tel" class="form-control br-money" id="input-campaign-value" name="input-campaign-value" placeholder="Valor da Campanha" readonly value="0">
+                                            <label for="input-campaign-value">Valor total da Collab</label>
                                         </div>
                                     </div>
                                 </div>
@@ -418,8 +317,8 @@ function body_modal(ref, params){
                             </div>
                             <div class="form-group my-2">
                                 <label for="wallets_categoria">Categorias da Collab:</label>
-                                <select class="select2-multiple-max-5 form-control" name="wallets_categoria[]" id="wallets_categoria" multiple required>
-                                    ${values_select}
+                                <select class="select2 form-control" name="wallets_categoria" id="wallets_categoria" multiple required>
+                                    
                                 </select>
                             </div>
                             <div class="form-check my-2">
@@ -449,35 +348,33 @@ function body_modal(ref, params){
                     </form>
                     
                 `)
-                
-                $(`input[type="radio"][name="wallets_mod"]`).change(function () {
-                
-                    if(this.value == "1"){
-                        $("#collab-input-total-value").prop("required", true).prop("readonly", false).val("")
-                        $("#aviso_total").html(`Nesta modalidade, é obrigatório o valor total da collab.`)
-                    }else{
-                        $("#collab-input-total-value").prop("required", false).prop("readonly", true).val("0")
-                        $("#aviso_total").html(``)
+
+                    $(`input[type="checkbox"][name="input-campaign-mod"]`).change(function () {
+
+                        if(this.checked){
+                            $("#input-campaign-value").prop("required", true).prop("readonly", false).val("")
+                            $("#aviso_total").html(`Nesta modalidade, é obrigatório o valor total da collab.`)
+                        }else{
+                            $("#input-campaign-value").prop("required", false).prop("readonly", true).val("0")
+                            $("#aviso_total").html(``)
+                        }
+                    })
+
+                    if (params.form == "edit-collab"){
+                        $("#collab-input-name").val(params.name).change()
+                        $(`input[type="radio"][name="wallets_mod"][value="${params.value_total > 0 ? '1' : '0'}"]`).click();
+                        $(`input[type="radio"][name="wallets_type"][value="${params.type == 1 ? '1' : '0'}"]`).click();
                     }
-                })
-                
-                $(`input[type="radio"][name="wallets_type"]`).change(function () {
-                
-                    if(this.value == "1"){
-                        $("#aviso_type").html(`<i class="bi bi-incognito"></i> Apenas convidados tem acesso.`)
-                    }else{
-                        $("#aviso_type").html(`<i class="bi bi-people"></i> Todos os usuários podem participar da collab`)
-                    }
-                })
-                
-                if (params.form == "edit-collab"){
-                    $("#collab-input-name").val(params.name).change()
-                    $(`input[type="radio"][name="wallets_mod"][value="${params.value_total > 0 ? '1' : '0'}"]`).click();
-                    $(`input[type="radio"][name="wallets_type"][value="${params.type == 1 ? '1' : '0'}"]`).click();
-                }
+
+
+                }).catch(error => {
+                    console.error('Erro ao obter dados:', error);
+                });
+
+
                 
                 break;
-            case 'edit-collab':
+            case 'edit-campaign':
                     
                     $.ajax({
                         type: "GET",
@@ -637,14 +534,6 @@ function body_modal(ref, params){
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
                                         <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('signin-password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
-                                    <div class="mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="always-logged" name="always-logged">
-                                            <label class="form-check-label text-muted fw-normal" for="always-logged">
-                                                Manter logado?
-                                            </label>
-                                        </div>
-                                    </div>
                                     <div class="col-xl-12 d-grid mb-3">
                                         <button type="submit" class="btn btn-lg btn-primary btn-submit">Entrar</button>
                                     </div>
@@ -749,14 +638,6 @@ function body_modal(ref, params){
 }
     
 $(document).ready(() => {
-
-    // const mp = new MercadoPago('TEST-c684c203-f1b9-479e-9aee-5f0fb641c0b5', { locale: 'pt-BR' });
-    
-    // mp.bricks().create("wallet", "wallet_container", {
-    //     initialization: {
-    //         preferenceId: "wallet_containers",
-    //     },
-    // });
 
     $(".select2").select2({
         placeholder: "Cidades participantes",

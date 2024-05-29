@@ -1,8 +1,21 @@
 <?php
 
+require __DIR__ . '/vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 require_once("../../../config/cors.php");
 require_once("../../../config/function.php");
-require __DIR__ . '/vendor/autoload.php';
+
+/*
+
+RewriteEngine On
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://www.maonaroda.etecsystems.com.br/$1 [R,L]
+
+*/
+
 
 function auto_decimal_format($n, $def = 2) {
     
@@ -322,13 +335,7 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $code = false;
                 
                 switch($_POST["query"]){
-                    case "new-login":
-
-                        $name = $_POST['name'];
-                        $email = $_POST['username'];
-                        $username = explode($_POST['username'], "@")[0];
-                        $password = md5($_POST['password'];
-
+                    case "---":
                         break;
                     default:
                         break;
@@ -342,9 +349,49 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
             switch($_POST["query"]){
                 case "new-login":
 
+                    $name = $_POST['name'];
                     $email = $_POST['username'];
-                    $username = explode($_POST['username'], "@")[0];
-                    $password = md5($_POST['password'];)
+                    $username = explode("@", $_POST['username'])[0];
+                    $password = md5($_POST['password']);
+
+                    $data = [
+                        "name" => $name,
+                        "email" => $email,
+                        "password" => $password,
+                        "username" => $username
+                    ];
+
+                    $r = create_user($data);
+
+                    if($r['error']){
+                        $code = 500;
+                        $msg['error'] = $r['error'];
+                    }else{
+
+                        $conn = conn();
+                        $stmt = $conn->prepare("SELECT * FROM users where email=?");
+                        $stmt->execute([$email]);
+                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        if ($rows){
+
+                            $msg = ["success" => true];
+
+                            foreach($rows as $user => $value){
+                                foreach($value as $chave => $sec_value){
+                                    $_SESSION[$chave] = $sec_value;
+                                }
+                            }
+
+                            $code = 200;
+                            $msg["msg"] = "Conta criada com sucesso! Bem vindo(a) {$_SESSION["name"]}";
+                            $hash_logged = md5(date('Y-m-d H:i:s'));
+
+                            $msg["logged"] = $hash_logged;
+                            $_SESSION["logged"] = $hash_logged;
+
+                        }
+                    }
 
                     break;
                 default:

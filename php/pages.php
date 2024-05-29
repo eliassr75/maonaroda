@@ -168,8 +168,8 @@ $campaigns = get_all('campaign', true);
         <div class="card custom-card item-card">
             <div class="card-body">
                 <div class="row">
-                    <div class="ms-auto col-md-8 text-center me-auto">
-                        <select class="form-control select2">
+                    <div class="ms-auto col-md-8 text-center align-items-center me-auto">
+                        <select class="form-control select2 mt-2">
                             <option></option>
                             <?php
                                 $citys = [];
@@ -183,6 +183,9 @@ $campaigns = get_all('campaign', true);
                                 <option value="<?=$city?>"><?=$city?></option>
                             <?php } ?>
                         </select>
+                        <button class="btn btn-primary label-btn mt-3" data-bs-toggle="modal" onclick="body_modal('campaign', { form: 'new-campaing'})" data-bs-target="#modal">
+                            <i class="label-btn-icon bi bi-plus-lg"></i> Publicar Campanha
+                        </button>
                     </div>
                 </div>
             </div>
