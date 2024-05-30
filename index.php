@@ -6,7 +6,7 @@ $page = (isset($_GET['p']) && !empty($_GET['p']) ? strtolower($_GET['p']) : fals
 ?>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-nav-layout="horizontal" data-theme-mode="light" data-header-styles="light" data-menu-styles="light" data-toggled="close" loader="disable" data-page-style="modern" data-nav-style="menu-click">
+<html lang="en" dir="ltr" data-nav-layout="horizontal" data-theme-mode="dark" data-header-styles="dark" data-menu-styles="dark" data-toggled="close" loader="disable" data-page-style="modern" data-nav-style="menu-click">
 
 <?php include('php/head.php');?>
 
@@ -41,7 +41,7 @@ $page = (isset($_GET['p']) && !empty($_GET['p']) ? strtolower($_GET['p']) : fals
         <footer class="mt-auto bg-white text-center">
             <div class=" py-3">
                 <span class="text-dark"> Copyright © <span id="year"></span>
-                    Designed with <span class="bi bi-heart-fill text-danger"></span> by <a href="https://etecsystems.com.br/" target="_blank" class="text-primary fw-semibold">EtecSystems</a> All rights reserved
+                    <a href="https://etecsystems.com.br/" target="_blank" class="text-primary fw-semibold">EtecSystems</a> All rights reserved
                 </span>
             </div>
         </footer>

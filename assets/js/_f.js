@@ -117,6 +117,64 @@ function auto_remove_alert(timeout=5000){
     }, timeout)
 }
 
+function checkEntity(el){
+
+    const cnpj = el.value
+
+    _alert("Informe um CNPJ válido!", "danger")
+
+    $('.btn-submit, #name, #username, #confirm-password, #password').prop('disabled', true);
+
+    if (cnpj.length === 18){
+
+        _alert("Validando CNPJ...", "warning")
+
+        $.ajax({
+            method: "get",
+            url: `https://brasilapi.com.br/api/cnpj/v1/${cnpj.replace('.', '').replace('/', '')}`,
+            success: function(data) {
+
+                entity = {
+                    query: "get-entity",
+                    name: data.nome_fantasia || data.razao_social,
+                    cnpj: cnpj,
+                    phone_number: data.ddd_telefone_1,
+                    postcode: data.cep,
+                    state: data.uf,
+                    city: data.municipio
+                }
+
+                $.ajax({
+                    method: "GET",
+                    url: api.internal,
+                    dataType: "JSON",
+                    data: entity,
+                    success: function (r){
+
+                        if(r.status){
+                            $('#name, #username, #confirm-password, #password').prop('disabled', false).parent().show(500);
+                            $('.btn-submit').prop('disabled', false);
+                        }
+
+                    },
+                    error: function (e){
+                        console.log(e);
+                        _alert(e.responseJSON ? e.responseJSON.error : e.statusText, "danger")
+                    }
+                })
+
+            },
+            error: function(e) {
+                _alert(e.responseJSON.message, "danger")
+            }
+        }).done(function(){
+            $('.btn-submit, #name, #username, #confirm-password, #password').prop('disabled', false);
+            auto_remove_alert(0)
+        })
+    }
+
+}
+
 function checkPassword(){
 
     const password = $("#password").val()
@@ -159,60 +217,102 @@ function body_modal(ref, params){
         let method = ""
         let url_api = ""
 
-        const allowed_mods = ["password-reset", "new-login"]
+        const allowed_mods = ["password-reset", "new-login", "recovery-code"]
         
         if (!logged && !allowed_mods.includes(ref)){
             ref = ""
         }
         
         switch(ref){
-        
-            case 'password-reset':
-                
+
+            case 'user':
+
                 method = "POST"
                 url_api = api.internal
-                
+                // email, username, password, city, state, country, postcode, gender, phone, ddi_phone, country_phone, document
                 $(".modal-content").html(`
         
-                    <form id="password-reset" name="password-reset">
-                        <input type="hidden" name="query" value="password-reset"/>
-                        <div class="modal-header">
-                            <h6 class="modal-title">
-                                <i class="bi bi-arrow-repeat"></i> Recuperação de Senha
-                            </h6>
-                            <button type="button" aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
+                <form id="new-user" name="new-user">
+                    <input type="hidden" name="query" value="${params.form}"/>
+                    ${params.form == "edit-user" ? `<input type="hidden" name="user_id" value="${params.id}"/>` : ""}
+                    <div class="modal-header">
+                        <h6 class="modal-title">
+                            <i class="bi bi-person-add"></i> ${params.form == "edit-user" ? "Editar Usuário":"Novo Usuário"}
+                        </h6>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-start">
+                        <div class="custom-alert"></div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="user-input-name" name="user_name" placeholder="Nome do Usuário" required>
+                            <label for="user-input-name"><i class="bi bi-person"></i> Nome do Usuário</label>
                         </div>
-                        <div class="modal-body text-start">
-                            <div class="authentication authentication-basic">
-                                <div class="custom-alert"></div>
-                                <div class="card-body">
-                                    <div class="input-box mb-3" data-bs-validate="Valid email is required: ex@abc.xyz">
-                                        <input type="email" class="form-control form-control-lg" id="username" name="username" placeholder="email@email.com" required>
-                                        <span class="authentication-input-icon"><i class="ri-mail-fill text-default fs-15 op-7"></i></span>
-                                    </div>
-
-                                    <div class="col-xl-12 d-grid mb-3">
-                                        <button type="submit" class="btn btn-lg btn-primary btn-submit">Recuperar</button>
-                                    </div>
-                                    <hr>
-                                    <div class="text-center">
-                                        <a href="javascript:void(0);" class="btn btn btn-primary-light" onclick="body_modal('login', {})">
-                                        <i class="bi bi-arrow-left-circle"></i> Voltar
-                                        </a>
+                        <hr>
+                        <div class="form-check my-2">
+                            <input class="form-check-input" type="radio" name="user_gender" id="user-input-gender-1" value="0" required checked>
+                            <label class="form-check-label" for="user-input-gender-1">
+                                Acumulativa
+                            </label>
+                        </div>
+                        <div class="form-check my-2">
+                            <input class="form-check-input" type="radio" name="user_gender" id="user-input-gender-2" value="1" required>
+                            <label class="form-check-label" for="user-input-gender-2">
+                                Progressiva
+                            </label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <div class="form-floating">
+                                    <div class="form-floating">
+                                        <input type="tel" class="form-control br-money" id="collab-input-total-value" name="wallets_value_total" placeholder="Valor total da Collab" readonly value="0">
+                                        <label for="collab-input-total-value">Valor total da Collab</label>
                                     </div>
                                 </div>
-        
-                            </div>  
+                            </div>
+                        
+                            <span class="fs-12 text-danger" id="aviso_total"></span>
                         </div>
-                    </form>
+                        <div class="form-group my-2">
+                            <label for="wallets_categoria">Categorias da Collab:</label>
+                            <select class="select2-multiple-max-5 form-control" name="wallets_categoria[]" id="wallets_categoria" multiple required>
+                                ${values_select}
+                            </select>
+                        </div>
+                        <div class="form-check my-2">
+                            <input class="form-check-input" type="radio" name="wallets_type" id="collab-input-type-public" value="0" required>
+                            <label class="form-check-label" for="collab-input-type-public">
+                                Pública 
+                            </label>
+                        </div>
+                        <div class="form-check my-2">
+                            <input class="form-check-input" type="radio" name="wallets_type" id="collab-input-type-private" value="1" required checked>
+                            <label class="form-check-label" for="collab-input-type-private">
+                                Privada
+                            </label>
+                        </div>
+                        <span class="fs-12 text-warning" id="aviso_type">
+                            <i class="bi bi-incognito"></i> Apenas convidados tem acesso.
+                        </span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary-light label-btn btn-submit">
+                            <i class="bi bi-floppy label-btn-icon"></i> ${params.form == "edit-collab" ? "Salvar":"Adicionar"} 
+                        </button> 
+                        <button type="button" class="btn btn-light label-btn" data-bs-dismiss="modal">
+                            <i class="bi bi-ban label-btn-icon"></i> Fechar
+                        </button>
+                    </div>
+                </form>
                     
                 `)
                 break;
             case 'new-login':
-                
+
                 method = "POST"
                 url_api = api.internal
-                
+
                 $(".modal-content").html(`
         
                     <form id="new-login" name="new-login">
@@ -228,21 +328,25 @@ function body_modal(ref, params){
                             <div class="authentication authentication-basic">
                                 <div class="custom-alert"></div>
                                 <div class="card-body">
+                                    <div class="input-box mb-3" data-bs-validate="Valid email is required: ex@abc.xyz">
+                                        <input type="tel" class="border form-control form-control-lg" onkeyup="checkEntity(this)" id="cnpj" name="cnpj" placeholder="CNPJ: 00.000.000/0000-00" required>
+                                        <span class="authentication-input-icon"><i class="ri-home-2-fill text-default fs-15 op-7"></i></span>
+                                    </div>
                                     <div class="input-box mb-3" data-bs-validate="Valid name is required: Lucas Souza">
-                                        <input type="text" class="form-control form-control-lg" id="name" name="name" minlength="10" placeholder="Lucas Sousa" required>
+                                        <input type="text" class="border form-control form-control-lg" id="name" name="name" minlength="10" placeholder="Lucas Sousa" required>
                                         <span class="authentication-input-icon"><i class="ri-user-fill text-default fs-15 op-7"></i></span>
                                     </div>
                                     <div class="input-box mb-3" data-bs-validate="Valid email is required: ex@abc.xyz">
-                                        <input type="email" class="form-control form-control-lg" id="username" name="username" placeholder="email@email.com" required>
+                                        <input type="email" class="border form-control form-control-lg" id="username" name="username" placeholder="email@email.com" required>
                                         <span class="authentication-input-icon"><i class="ri-mail-fill text-default fs-15 op-7"></i></span>
                                     </div>
                                     <div class="input-group input-box mb-3">
-                                        <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="password" name="password" maxlength="8" placeholder="password" required>
+                                        <input type="password" class="border form-control form-control-lg" onkeyup="checkPassword()" id="password" name="password" maxlength="8" placeholder="password" required>
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
                                         <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
                                     <div class="input-group input-box mb-3">
-                                        <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="confirm-password" name="confirm-password" maxlength="8" autocomplete="new-password" placeholder="Confirme a senha" required>
+                                        <input type="password" class="border form-control form-control-lg" onkeyup="checkPassword()" id="confirm-password" name="confirm-password" maxlength="8" autocomplete="new-password" placeholder="Confirme a senha" required>
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
                                         <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('confirm-password',this)" id="button-addon3"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
@@ -263,10 +367,14 @@ function body_modal(ref, params){
                     </form>
                     
                 `)
-                
+
+                $('#cnpj').mask("00.000.000/0000-00")
+                $('#name, #username, #confirm-password, #password').parent().hide(500);
+                $('.btn-submit').prop('disabled', true);
+
                 break;
             case 'campaign':
-            
+
                 method = "POST"
                 url_api = api.internal
 
@@ -372,10 +480,10 @@ function body_modal(ref, params){
                 });
 
 
-                
+
                 break;
             case 'edit-campaign':
-                    
+
                     $.ajax({
                         type: "GET",
                         url: api.internal,
@@ -394,13 +502,13 @@ function body_modal(ref, params){
                             console.log(data)
                         }
                     })
-                    
+
                 break;
             case 'logout':
-            
+
                 method = "GET"
                 url_api = api.external
-                
+
                 $(".modal-content").html(`
                 
                 <form id="new-collab" name="new-collab">
@@ -421,88 +529,110 @@ function body_modal(ref, params){
                     </div>
                 </form>
                 `)
-                
+
                 break;
-            case 'user':
-            
-                method = "POST"
-                url_api = api.internal
-                // email, username, password, city, state, country, postcode, gender, phone, ddi_phone, country_phone, document
-                $(".modal-content").html(`
-        
-                <form id="new-user" name="new-user">
-                    <input type="hidden" name="query" value="${params.form}"/>
-                    ${params.form == "edit-user" ? `<input type="hidden" name="user_id" value="${params.id}"/>` : ""}
-                    <div class="modal-header">
-                        <h6 class="modal-title">
-                            <i class="bi bi-person-add"></i> ${params.form == "edit-user" ? "Editar Usuário":"Novo Usuário"}
-                        </h6>
-                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body text-start">
-                        <div class="custom-alert"></div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="user-input-name" name="user_name" placeholder="Nome do Usuário" required>
-                            <label for="user-input-name"><i class="bi bi-person"></i> Nome do Usuário</label>
-                        </div>
-                        <hr>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="user_gender" id="user-input-gender-1" value="0" required checked>
-                            <label class="form-check-label" for="user-input-gender-1">
-                                Acumulativa
-                            </label>
-                        </div>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="user_gender" id="user-input-gender-2" value="1" required>
-                            <label class="form-check-label" for="user-input-gender-2">
-                                Progressiva
-                            </label>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text">R$</span>
-                                <div class="form-floating">
-                                    <div class="form-floating">
-                                        <input type="tel" class="form-control br-money" id="collab-input-total-value" name="wallets_value_total" placeholder="Valor total da Collab" readonly value="0">
-                                        <label for="collab-input-total-value">Valor total da Collab</label>
+            case 'password-reset':
+
+                method = "GET"
+                let body = ``
+
+                if(params.page){
+                    switch (params.page){
+                        case 'get-email':
+                            body = `
+                            <input type="hidden" name="sub-query" value="get-email"/>
+                            <div class="card-body row">
+                                <div class="col-12">
+                                    <div class="form-floating mb-3" data-bs-validate="Valid email is required: ex@abc.xyz">
+                                        <input type="email" class="form-control" id="username" name="username" placeholder="" required>
+                                        <label for="username">
+                                            <i class="ri-mail-fill ms-3"></i> Informe seu E-mail
+                                        </label>
                                     </div>
                                 </div>
+
+                                <div class="col-md-6 d-grid mb-3">
+                                    <button type="submit" class="btn btn-lg btn-primary btn-submit">Recuperar</button>
+                                </div>
+                                <div class="col-md-6 d-grid mb-3">
+                                    <button type="button" class="btn btn-lg btn-danger" onclick="body_modal('login', {})">Cancelar</button>
+                                </div>
                             </div>
-                        
-                            <span class="fs-12 text-danger" id="aviso_total"></span>
+                            `
+                            break;
+                        case 'recovery-code':
+                            method = "GET"
+                            body = `
+                            <input type="hidden" name="sub-query" value="recovery-code"/>
+                            <div class="card-body row">
+                                <div class="col-12">
+                                    <label class="my-1 text-danger">${params.msg}</label>
+                                    <div class="form-floating mb-3" data-bs-validate="Valid email is required: ex@abc.xyz">
+                                        <input type="tel" class="form-control" id="code" name="code" placeholder="" required>
+                                        <label for="code">
+                                            <i class="ri-key-fill ms-3"></i> Digite o código 
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 d-grid mb-3">
+                                    <button type="submit" class="btn btn-lg btn-primary btn-submit">Validar Código</button>
+                                </div>
+                                <div class="col-md-6 d-grid mb-3">
+                                    <button type="button" class="btn btn-lg btn-danger" onclick="body_modal('login', {})">Cancelar</button>
+                                </div>
+                            </div>
+                            `
+                            break;
+                        case 'new-password':
+                            method = "POST"
+                            body = `
+                            <input type="hidden" name="sub-query" value="new-password"/>
+                            <div class="card-body row">
+                                <div class="col-12">
+                                    <label class="my-1 text-danger">Informe a nova senha de acesso</label>
+                                    <div class="input-group input-box mb-3">
+                                        <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="password" name="password" maxlength="8" placeholder="password" required>
+                                        <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
+                                    </div>
+                                    <div class="input-group input-box mb-3">
+                                        <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="confirm-password" name="confirm-password" maxlength="8" autocomplete="new-password" placeholder="Confirme a senha" required>
+                                        <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('confirm-password',this)" id="button-addon3"><i class="ri-eye-off-line align-middle"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 d-grid mb-3">
+                                    <button type="submit" class="btn btn-lg btn-primary btn-submit">Continuar</button>
+                                </div>
+                                <div class="col-md-6 d-grid mb-3">
+                                    <button type="button" class="btn btn-lg btn-danger" onclick="body_modal('login', {})">Cancelar</button>
+                                </div>
+                            </div>
+                            `
+                            break;
+                    }
+                }
+
+
+                url_api = api.internal
+
+                $(".modal-content").html(`
+        
+                    <form id="password-reset" name="password-reset">
+                        <input type="hidden" name="query" value="password-reset"/>
+                        <div class="modal-header">
+                            <h6 class="modal-title">
+                                <i class="bi bi-arrow-repeat"></i> Recuperação de Senha
+                            </h6>
+                            <button type="button" aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="form-group my-2">
-                            <label for="wallets_categoria">Categorias da Collab:</label>
-                            <select class="select2-multiple-max-5 form-control" name="wallets_categoria[]" id="wallets_categoria" multiple required>
-                                ${values_select}
-                            </select>
+                        <div class="modal-body text-start">
+                            <div class="authentication_new authentication-basic">
+                                <div class="custom-alert"></div>
+                                ${body}
+                            </div>  
                         </div>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="wallets_type" id="collab-input-type-public" value="0" required>
-                            <label class="form-check-label" for="collab-input-type-public">
-                                Pública 
-                            </label>
-                        </div>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="wallets_type" id="collab-input-type-private" value="1" required checked>
-                            <label class="form-check-label" for="collab-input-type-private">
-                                Privada
-                            </label>
-                        </div>
-                        <span class="fs-12 text-warning" id="aviso_type">
-                            <i class="bi bi-incognito"></i> Apenas convidados tem acesso.
-                        </span>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary-light label-btn btn-submit">
-                            <i class="bi bi-floppy label-btn-icon"></i> ${params.form == "edit-collab" ? "Salvar":"Adicionar"} 
-                        </button> 
-                        <button type="button" class="btn btn-light label-btn" data-bs-dismiss="modal">
-                            <i class="bi bi-ban label-btn-icon"></i> Fechar
-                        </button>
-                    </div>
-                </form>
+                    </form>
                     
                 `)
                 break;
@@ -538,7 +668,7 @@ function body_modal(ref, params){
                                         <button type="submit" class="btn btn-lg btn-primary btn-submit">Entrar</button>
                                     </div>
                                     <hr>
-                                    <div class="text-center mb-2"><a href="javascript:void(0);" class="text-danger" onclick="body_modal('password-reset', {})">Não lembra a senha?</a></div>
+                                    <div class="text-center mb-2"><a href="javascript:void(0);" class="text-danger" onclick="body_modal('password-reset', {page: 'get-email'})">Não lembra a senha?</a></div>
                                     <div class="text-center mb-0">Não é um membro?<a href="javascript:void(0);" class="text-primary ms-2" onclick="body_modal('new-login', {})">Criar uma conta</a></div>
                                 </div>
         
@@ -584,7 +714,7 @@ function body_modal(ref, params){
                 dataType: 'json',
                 success: function(data) {
                 
-                    // console.log(data)
+                    console.log(params, method, data)
                     
                     if (data.end_session){
                         window.location.href = "/"
@@ -602,11 +732,16 @@ function body_modal(ref, params){
                             }
 
                         }
-                        
-                        setTimeout(() => {
-                            window.location.reload()
-                        }, 1500)
-                        
+
+                        if(data.recovery){
+                            body_modal('password-reset', { page: data.page, msg: data.msg })
+                        }
+
+                        if(data.reload){
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 1500)
+                        }
 
                     } else {
                         _alert(data.msg, "warning")

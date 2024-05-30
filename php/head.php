@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title> Mão na Roda </title>
-    <meta name="Description" content="WalletCollab é uma plataforma inovadora para gerenciamento colaborativo de fundos compartilhados. Facilitamos a organização e o acompanhamento de metas financeiras compartilhadas, permitindo que grupos colaborem eficientemente para alcançar objetivos financeiros comuns. Junte-se a nós e experimente uma nova maneira de economizar e crescer juntos!">
+    <meta name="Description" content="Nossa plataforma reúne promoções imperdíveis de lojas, restaurantes e serviços do Rio Grande do Sul. Encontre tudo o que você precisa com preços incríveis e ajude o comércio local a prosperar. Além disso, parte da renda do Mão na Roda é destinada a ações sociais, fazendo a diferença na vida de quem mais precisa.">
     <meta name="Author" content="EtecSystems">
-	<meta name="keywords" content="Gerenciamento colaborativo de fundos, Economia em grupo, Finanças compartilhadas, Gestão de metas financeiras, Poupança em equipe, Colaboração financeira, Fundos comuns, Plataforma de economia compartilhada, Organização financeira em grupo, Crescimento financeiro conjunto">
+    <meta name="keywords" content="Promoções, Economia, Empresas, Solidariedade, Rio Grande do Sul, Descontos, Ofertas, Restaurantes, Comércio local, Serviços, Comunidade">
 
     <link rel="icon" href="/assets/images/default.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

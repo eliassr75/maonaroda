@@ -12382,6 +12382,11 @@ caption {
 .authentication {
     min-height: 30vh;
 }
+
+.authentication_new {
+    min-height: 0vh;
+}
+
 .authentication .authentication-brand.desktop-logo {
     display: block;
 }
