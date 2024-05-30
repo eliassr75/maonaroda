@@ -110,8 +110,18 @@ function create_campaign($data) {
         $entity_id = (isset($data["entity_id"]) ? $data["entity_id"] : "");
         $local = (isset($data["local"]) ? $data["local"] : "");
         $active = (isset($data["active"]) ? $data["active"] : "");
+
         if (empty($name)) {
             return ["error" => "Nome da campanha é obrigatório."];
+        }
+        if (empty($description)) {
+            return ["error" => "A descrição da campanha é obrigatória."];
+        }
+        if (empty($value)) {
+            return ["error" => "O valor da campanha é obrigatório."];
+        }
+        if (empty($local)) {
+            return ["error" => "O local da campanha é obrigatório."];
         }
 
         try {
@@ -137,6 +147,10 @@ function create_entity($data) {
         $document = (isset($data["cnpj"]) ? $data["cnpj"] : "");
         $photo = (isset($data["photo"]) ? $data["photo"] : "");
         $active = (isset($data["active"]) ? $data["active"] : "");
+
+        if (empty($document)) {
+            return ["error" => "O CNPJ da empresa é obrigatório."];
+        } 
 
         try {
             $stmt = $conn->prepare("INSERT INTO entity (name, cnpj, photo, active) VALUES (?, ?, ?, ?)");
@@ -169,10 +183,25 @@ function create_user($data) {
     $ddi_phone = (isset($data["ddi_phone"]) ? $data["ddi_phone"] : "");
     $country_phone = (isset($data["country_phone"]) ? $data["country_phone"] : "");
 
+    if (empty($name)) {
+        return ["error" => "Nome é obrigatório."];
+    }
+    if (empty($email)) {
+        return ["error" => "E-mail é obrigatório."];
+    }
+    if (empty($username)) {
+        return ["error" => "Nome de usuário é obrigatório."];
+    }
+    if (empty($password)) {
+        return ["error" => "Senha é obrigatória."];
+    }
+
+    $hashed_password = md5($password, PASSWORD_BCRYPT);
+
     try {
         $stmt = $conn->prepare("INSERT INTO users (name, email, username, password, city, state, country, postcode,
                                                     gender, phone, ddi_phone, country_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $email, $username, $password, $city, $state, $country, $postcode, $gender, $phone, $ddi_phone, $country_phone]);
+        $stmt->execute([$name, $email, $username, $hashed_password, $city, $state, $country, $postcode, $gender, $phone, $ddi_phone, $country_phone]);
 
         $last_id = $conn->lastInsertId();
 
