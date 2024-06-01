@@ -200,7 +200,7 @@ $campaigns = get_all('campaign', true);
                     <div class="product-grid6 card-body p-0">
                         <div class="product-image6">
                             <a href="product-details.html" class="img-container">
-                                <img class="img-fluid w-100" src="../assets/images/pngs/4.png" alt="img">
+                                <img class="img-fluid img-container w-100 p-3" src="<?=$campaign['image'] ?? '/assets/images/logo_lg_default.png'?>" alt="img">
                             </a>
                             <div class="icon-container">
                                 <ul class="icons">

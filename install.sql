@@ -26,8 +26,20 @@ CREATE TABLE entity (
     created TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated TIMESTAMPTZ NULL,
     photo text NOT NULL,
-    active BOOLEAN DEFAULT true,
-)
+    active BOOLEAN DEFAULT true
+);
+
+CREATE TABLE states (
+    id SERIAL primary key,
+    name text NOT NULL
+);
+
+CREATE TABLE city (
+    id SERIAL primary key,
+    name text NOT NULL,
+    state_id INT not null,
+    FOREIGN KEY (state_id) REFERENCES states(id)
+);
 
 -- Tabela de carteiras
 CREATE TABLE campaign (

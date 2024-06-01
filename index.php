@@ -6,7 +6,7 @@ $page = (isset($_GET['p']) && !empty($_GET['p']) ? strtolower($_GET['p']) : fals
 ?>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-nav-layout="horizontal" data-theme-mode="dark" data-header-styles="dark" data-menu-styles="dark" data-toggled="close" loader="disable" data-page-style="modern" data-nav-style="menu-click">
+<html lang="en" dir="ltr" data-nav-layout="horizontal" data-theme-mode="white" data-header-styles="white" data-menu-styles="white" data-toggled="close" loader="disable" data-page-style="modern" data-nav-style="menu-click">
 
 <?php include('php/head.php');?>
 
@@ -30,7 +30,7 @@ $page = (isset($_GET['p']) && !empty($_GET['p']) ? strtolower($_GET['p']) : fals
         <!-- End::app-content -->
         
         <div class="modal fade effect-scale" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" id="modal">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down modal-lg" role="document">
                 <div class="modal-content">
                     
                 </div>

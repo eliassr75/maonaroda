@@ -216,23 +216,12 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
         switch($QUERY){
             case 'get-entity':
 
-                /*
+                $msg = create_entity($_GET);
+                if($msg['success']){
+                    $_SESSION['entity_id'] = $msg['id'];
+                }
 
-                query: "get-entity",
-                name: data.nome_fantasia || data.razao_social,
-                cnpj: cnpj,
-                phone_number: data.ddd_telefone_1,
-                postcode: data.cep,
-                state: data.uf,
-                city: data.municipio
-
-                */
-                $cnpj = $_GET['cnpj'];
-                $name = $_GET['name'];
-                $phone_number = $_GET['phone_number'];
-                $postcode = $_GET['postcode'];
-                $state = $_GET['state'];
-                $city = $_GET['city'];
+                $code = $msg['code'];
 
                 break;
             case 'get-campaigns':
@@ -242,7 +231,6 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 break;
             case 'edit-collab':
                 $code = 200;
-
                 $msg = get_collab($_GET["id"]);
                 break;
             case 'password-reset':
@@ -290,7 +278,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
             
                 $username = (isset($_GET["username"]) ? $_GET["username"] : "");
                 $always_logged = (isset($_GET["always-logged"]) ? true : false);
-                $password = (isset($_GET["password"]) ? md5($_GET["password"]) : "");
+                $password = ($_GET["password"] ?? "");
                 
                 if (empty($username) || empty($password)){
                     $msg["error"] = "Usuário ou senha inválidos!";
@@ -298,32 +286,41 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 
                     $conn = conn();
                     
-                    $stmt = $conn->prepare("SELECT * FROM users where (username=? or email=?) and password=?");
-                    $stmt->execute([$username, $username, $password]);
+                    $stmt = $conn->prepare("SELECT * FROM users where username=? or email=?");
+                    $stmt->execute([$username, $username]);
                     
                     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     
                     if ($rows){
                         
-                        $msg = ["success" => true];
-                    
+
+                        $validPass = true;
                         foreach($rows as $user => $value){
+
+                            if(!password_verify($password, $value['password'])){
+                                $validPass = false;
+                                break;
+                            }
+
                             foreach($value as $chave => $sec_value){
                                 $_SESSION[$chave] = $sec_value;
                             }
                         }
-                        
-                        $code = 200;
-                        $msg["msg"] = "Autenticação concluída, bem vindo(a) {$_SESSION["name"]}";
-                        $hash_logged = md5(date('Y-m-d H:i:s'));
-                        
-                        $msg["logged"] = $hash_logged;
-                        $msg["reload"] = true;
-                        $_SESSION["logged"] = $hash_logged;
-                                            
-                        if ($always_logged){
-                            $msg["persist_login"] = md5("{$_SERVER['HTTP_USER_AGENT']} {$_SESSION["token"]}");
+
+                        if(!$validPass){
+                            $msg["error"] = "Usuário ou senha inválidos!";
+                        }else{
+                            $msg = ["success" => true];
+                            $code = 200;
+                            $msg["msg"] = "Autenticação concluída, bem vindo(a) {$_SESSION["name"]}";
+                            $hash_logged = md5(date('Y-m-d H:i:s'));
+
+                            $msg["logged"] = $hash_logged;
+                            $msg["reload"] = true;
+                            $_SESSION["logged"] = $hash_logged;
                         }
+                        
+
                         
                     }else{
                         $msg["error"] = "Usuário ou senha inválidos!";
@@ -332,28 +329,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 break;
             default:
                 
-                if(isset($_GET["token"]) && !empty($_GET["token"])){
-                    
-                    $token = $_GET["token"];
-                    $user = validarToken($token);
-                    if ($user) {
-                    
-                        switch($QUERY){
-                            case "get_info_dashboard":
-                            
-                                $msg = ["results" => dashboard($user)];
-                                $code = 200;
-                            
-                                break;
-                        }
-                    
-                    }else{
-                        $msg["error"] = "O token informado é inválido!";
-                    }
-                    
-                }else{
-                    $msg["error"] = "O token é obrigatório!";
-                }
+
                 
                 break;
         }
@@ -373,15 +349,32 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (isset($_POST["query"]) && !empty($_POST["query"])){
                 
-        if(isset($_SESSION["token"]) && !empty($_SESSION["token"])){
+        if(isset($_SESSION["password"]) && !empty($_SESSION["password"])){
             
-            $token = $_SESSION["token"];
-            $user = validarToken($token);
+            $email = $_SESSION["email"];
+            $user = validarEmail($email);
             if ($user) {
                 $code = false;
                 
                 switch($_POST["query"]){
-                    case "---":
+                    case 'new-campaing':
+
+                        $msg = create_campaign($_POST);
+
+                        break;
+                    case "summernote_upload_image":
+
+                        $uploadDir = "../../../assets/images/";
+                        $destinationPath = $uploadDir . $_FILES["file"]["name"];
+
+                        $newFileName = md5($_FILES["file"]["name"] . date('Y-m-d H:i:s'));
+                        $newDestinationPath = $uploadDir . $newFileName;
+
+                        if(move_uploaded_file($_FILES["file"]["tmp_name"], $destinationPath)){
+                            rename($destinationPath, $newDestinationPath);
+                        }
+
+                        exit("/assets/images/{$newFileName}");
                         break;
                     default:
                         break;
@@ -401,11 +394,12 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                         try {
 
                             $code = 200;
-                            $password = md5($_POST["password"]);
+                            $password = password_hash($_POST["password"], PASSWORD_BCRYPT);
                             $email = $_SESSION['recovery-email'];
 
                             $conn = conn();
-                            $conn->query("UPDATE users SET password = '$password' where email='$email'");
+                            $stmt = $conn->prepare("UPDATE users SET password = ? where email = ?");
+                            $stmt->execute([$password, $email]);
 
                             $stmt = $conn->prepare("SELECT * FROM users where email=?");
                             $stmt->execute([$email]);
@@ -440,13 +434,15 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $name = $_POST['name'];
                     $email = $_POST['username'];
                     $username = explode("@", $_POST['username'])[0];
-                    $password = md5($_POST['password']);
+                    $password = password_hash($_POST['password'],PASSWORD_BCRYPT);
+                    $entity_id = ($_SESSION['entity_id'] ?? $_POST['entity_id']);
 
                     $data = [
                         "name" => $name,
                         "email" => $email,
                         "password" => $password,
-                        "username" => $username
+                        "username" => $username,
+                        "entity_id" => $entity_id
                     ];
 
                     $r = create_user($data);
@@ -476,6 +472,7 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                             $hash_logged = md5(date('Y-m-d H:i:s'));
 
                             $msg["logged"] = $hash_logged;
+                            $msg["reload"] = true;
                             $_SESSION["logged"] = $hash_logged;
 
                         }

@@ -13,10 +13,10 @@
                 <a href="/" class="header-logo">
                     <img src="/assets/images/logo_lg_default.png" alt="logo" class="desktop-logo">
                     <img src="/assets/images/logo_lg_default.png" alt="logo" class="toggle-logo">
-                    <img src="/assets/images/white.png" alt="logo" class="desktop-dark">
-                    <img src="/assets/images/white.png" alt="logo" class="toggle-dark">
-                    <img src="/assets/images/black.png" alt="logo" class="desktop-white">
-                    <img src="/assets/images/black.png" alt="logo" class="toggle-white">
+                    <img src="/assets/images/logo_lg_default.png" alt="logo" class="desktop-dark">
+                    <img src="/assets/images/logo_lg_default.png" alt="logo" class="toggle-dark">
+                    <img src="/assets/images/logo_lg_default.png" alt="logo" class="desktop-white">
+                    <img src="/assets/images/logo_lg_default.png" alt="logo" class="toggle-white">
                 </a>
             </div>
         </div>

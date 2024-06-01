@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
         switch($QUERY){
             case "check-logged":
             
-                validarToken($_SESSION['token']);
+                validarEmail($_SESSION['email']);
                 
                 $code = 200;
                 $hash = ((isset($_GET["hash"]) && !empty($_GET["hash"])) ? $_GET["hash"] : false);
