@@ -12,7 +12,7 @@
     <link rel="icon" href="/assets/images/default.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link id="style" href="assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+    <link id="style" href="/assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
     <link href="/assets/css/styles.min.css" rel="stylesheet" >
     <link href="/assets/css/icons.css" rel="stylesheet" >
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
