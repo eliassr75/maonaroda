@@ -229,9 +229,13 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 $msg["error"] = null;
                 $msg["data"] = get_all("campaign");
                 break;
-            case 'edit-collab':
+            case 'edit-campaign':
                 $code = 200;
-                $msg = get_collab($_GET["id"]);
+                $msg = get_campaign_by_id($_GET["id"]);
+                $msg['value'] = str_replace('.', ',', $msg['value']);
+                $msg['form'] = "edit-campaign";
+                $msg['success'] = true;
+
                 break;
             case 'password-reset':
 
@@ -357,9 +361,61 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $code = false;
                 
                 switch($_POST["query"]){
-                    case 'new-campaing':
+                    case 'edit-campaign':
 
-                        $msg = create_campaign($_POST);
+                        if(isset($_FILES["input-campaign-logo"]["name"])) {
+                            $uploadDir = "../../../assets/images/";
+                            $destinationPath = $uploadDir . $_FILES["input-campaign-logo"]["name"];
+
+                            $newFileName = md5($_FILES["input-campaign-logo"]["name"] . date('Y-m-d H:i:s'));
+                            $newDestinationPath = $uploadDir . $newFileName;
+
+                            if (move_uploaded_file($_FILES["input-campaign-logo"]["tmp_name"], $destinationPath)) {
+                                rename($destinationPath, $newDestinationPath);
+                                $_POST['input-campaign-logo'] = "/assets/images/{$newFileName}";
+                            }
+                        }else{
+                            $_POST['input-campaign-logo'] = $_POST['campaign_old_image'];
+                        }
+                        $_POST['input-campaign-logo'] = $_POST['input-campaign-logo'] ?? $_POST['campaign_old_image'];
+
+                        $msg = campaign($_POST, true);
+                        if($msg['error']){
+                            $code = 500;
+                        }else{
+                            $code = $msg['code'];
+                            $msg['success'] = true;
+                            $msg['msg'] = "Campanha modificada com sucesso!";
+                            $msg['reload'] = true;
+                        }
+
+                        break;
+                    case 'new-campaign':
+
+                        if(isset($_FILES["input-campaign-logo"]["name"])) {
+                            $uploadDir = "../../../assets/images/";
+                            $destinationPath = $uploadDir . $_FILES["input-campaign-logo"]["name"];
+
+                            $newFileName = md5($_FILES["input-campaign-logo"]["name"] . date('Y-m-d H:i:s'));
+                            $newDestinationPath = $uploadDir . $newFileName;
+
+                            if (move_uploaded_file($_FILES["input-campaign-logo"]["tmp_name"], $destinationPath)) {
+                                rename($destinationPath, $newDestinationPath);
+                                $_POST['input-campaign-logo'] = "/assets/images/{$newFileName}";
+                            }
+                        }else{
+                            $_POST['input-campaign-logo'] = $_POST['campaign_old_image'];
+                        }
+
+                        $msg = campaign($_POST);
+                        if($msg['error']){
+                            $code = 500;
+                        }else{
+                            $code = $msg['code'];
+                            $msg['success'] = true;
+                            $msg['msg'] = "Campanha criada com sucesso!";
+                            $msg['reload'] = true;
+                        }
 
                         break;
                     case "summernote_upload_image":

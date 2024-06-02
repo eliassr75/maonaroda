@@ -5651,6 +5651,11 @@ const configDataTable = {
     }
 }
 
+function getKeysContainingSubstring(obj, substring) {
+    const lowerSubstring = substring;
+    return Object.keys(obj).filter(key => key.includes(lowerSubstring));
+}
+
 function uploadImage(image) {
     var data = new FormData();
     data.append("file", image);
@@ -5884,7 +5889,7 @@ function body_modal(ref, params){
         </div>
     </div>
     <div class="p-2 text-center">
-        <button type="button" class="btn btn-light label-btn" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-danger label-btn" data-bs-dismiss="modal">
             <i class="bi bi-ban label-btn-icon"></i> Cancelar
         </button>
     </div>
@@ -5979,10 +5984,10 @@ function body_modal(ref, params){
                         </span>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary-light label-btn btn-submit">
+                        <button type="submit" class="btn btn-info-gradient label-btn btn-submit">
                             <i class="bi bi-floppy label-btn-icon"></i> ${params.form == "edit-collab" ? "Salvar":"Adicionar"} 
                         </button> 
-                        <button type="button" class="btn btn-light label-btn" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-danger label-btn" data-bs-dismiss="modal">
                             <i class="bi bi-ban label-btn-icon"></i> Fechar
                         </button>
                     </div>
@@ -6025,20 +6030,20 @@ function body_modal(ref, params){
                                     <div class="input-group input-box mb-3">
                                         <input type="password" class="border form-control form-control-lg" onkeyup="checkPassword()" id="password" name="password" maxlength="8" placeholder="password" required>
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
-                                        <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
+                                        <button type="button" aria-label="button" class="btn btn-danger" onclick="createpassword('password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
                                     <div class="input-group input-box mb-3">
                                         <input type="password" class="border form-control form-control-lg" onkeyup="checkPassword()" id="confirm-password" name="confirm-password" maxlength="8" autocomplete="new-password" placeholder="Confirme a senha" required>
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
-                                        <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('confirm-password',this)" id="button-addon3"><i class="ri-eye-off-line align-middle"></i></button>
+                                        <button type="button" aria-label="button" class="btn btn-danger" onclick="createpassword('confirm-password',this)" id="button-addon3"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
 
                                     <div class="col-xl-12 d-grid mb-3">
-                                        <button type="submit" class="btn btn-lg btn-primary btn-submit">Criar Conta</button>
+                                        <button type="submit" class="btn btn-lg btn-info-gradient btn-submit">Criar Conta</button>
                                     </div>
                                     <hr>
                                     <div class="text-center">
-                                        <a href="javascript:void(0);" class="btn btn-lg btm-w-lg btn-primary-light " onclick="body_modal('login', {})">
+                                        <a href="javascript:void(0);" class="btn btn-lg btm-w-lg btn-info-gradient" onclick="body_modal('login', {})">
                                         <i class="bi bi-arrow-left-circle"></i> Voltar
                                         </a>
                                     </div>
@@ -6053,6 +6058,13 @@ function body_modal(ref, params){
                 $('#cnpj').mask("00.000.000/0000-00")
                 $('#name, #username, #confirm-password, #password').parent().hide(500);
                 $('.btn-submit').prop('disabled', true);
+
+                break;
+            case 'view-campaign':
+
+                console.log(params)
+
+                $(".modal-content").html(``)
 
                 break;
             case 'campaign':
@@ -6073,7 +6085,10 @@ function body_modal(ref, params){
                 
                 <form id="new-campaign" name="new-campaign">
                     <input type="hidden" name="query" value="${params.form}"/>
-                    ${params.form == "edit-campaign" ? `<input type="hidden" name="campaign_id" value="${params.id}"/>` : ""}
+                    ${params.form == "edit-campaign" ? `
+                        <input type="hidden" name="campaign_id" value="${params.id}"/>
+                        <input type="hidden" name="campaign_old_image" value="${params.logo}"/>
+                    ` : ""}
                     <div class="modal-header">
                         <h6 class="modal-title">
                             <i class="bi bi-newspaper"></i> ${params.form == "edit-campaign" ? "Editar Campanha":"Nova Campanha"}
@@ -6083,11 +6098,11 @@ function body_modal(ref, params){
                     <div class="modal-body text-start">
                         <div class="custom-alert"></div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="input-campaing-name" name="input-campaing-name" placeholder="Nome da Campanha" required>
-                            <label for="input-campaing-name">Nome da Campanha</label>
+                            <input type="text" class="form-control" id="input-campaign-name" name="input-campaign-name" placeholder="Nome da Campanha" required>
+                            <label for="input-campaign-name">Nome da Campanha</label>
                         </div>
                         <div class="form-check my-2">
-                            <input class="form-check-input" type="checkbox" name="input-campaign-active" id="input-campaign-active" checked>
+                            <input class="form-check-input" type="checkbox" name="input-campaign-active" id="input-campaign-active" ${params.active ? "checked" : ""}>
                             <label class="form-check-label" for="input-campaign-active">
                                 Ativa
                             </label>
@@ -6113,7 +6128,7 @@ function body_modal(ref, params){
                             <span class="fs-12 text-danger" id="aviso_total"></span>
                         </div>
                         
-                        <div class="row mb-3">
+                        <div class="row mb-3 fields-local">
                             <label for="input-campaign-state" class="col-12">Local da Campanha:</label>
                             <div class="col-md-6 form-group my-2">
                                 <select class="select2 form-control" name="input-campaign-state" id="input-campaign-state" required>
@@ -6129,19 +6144,20 @@ function body_modal(ref, params){
                         
                         <div class="form-group mb-3">
                             <label>Descrição da Campanha:</label>
-                            <textarea class="form-control" id="summernote" name="input-campaign-editordata" required></textarea>
+                            <textarea class="form-control" id="summernote" name="input-campaign-editordata" required>${params.description ? params.description : ""}</textarea>
                         </div>
                         
                         <div class="form-group">
                             <label>Logo:</label>
-                            <input type="file" class="form-control" name="input-campaign-logo" id="input-campaign-logo" accept="image/png, image/jpg, image/jpeg">
+                            <input type="file" class="form-control" name="input-campaign-logo" id="input-campaign-logo" 
+                            accept="image/png, image/jpg, image/jpeg" ${!params.logo ? "required" : ""}>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary-light label-btn btn-submit">
-                            <i class="bi bi-floppy label-btn-icon"></i> ${params.form == "edit-collab" ? "Salvar":"Adicionar"} 
+                        <button type="submit" class="btn btn-info-gradient label-btn btn-submit">
+                            <i class="bi bi-floppy label-btn-icon"></i> ${params.form == "edit-campaign" ? "Salvar":"Adicionar"} 
                         </button> 
-                        <button type="button" class="btn btn-light label-btn" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-danger label-btn" data-bs-dismiss="modal">
                             <i class="bi bi-ban label-btn-icon"></i> Fechar
                         </button>
                     </div>
@@ -6177,7 +6193,7 @@ function body_modal(ref, params){
 
                     if(this.checked){
                         $("#input-campaign-value").prop("required", true).prop("readonly", false).val("")
-                        $("#aviso_total").html(`Nesta modalidade, é obrigatório o valor total da collab.`)
+                        $("#aviso_total").html(`Nesta modalidade, é obrigatório o valor da campanha.`)
                     }else{
                         $("#input-campaign-value").prop("required", false).prop("readonly", true).val("0")
                         $("#aviso_total").html(``)
@@ -6194,10 +6210,6 @@ function body_modal(ref, params){
                         $("#aviso_total").html(``)
                     }
                 })
-
-                if (params.form == "edit-campaign"){
-                    return false
-                }
 
                 $("#input-campaign-state").select2({
                     placeholder: "Selecione o Estado",
@@ -6230,6 +6242,22 @@ function body_modal(ref, params){
 
                 })
 
+                if(params.id){
+                    params.name ? $('input[name="input-campaign-name"]').val(params.name).trigger('change') : "";
+                    params.active ? $('input[name="input-campaign-active"]').prop('checked', true) : "";
+                    params.value >= 1 ? $('input[name="input-campaign-mod"]').prop('checked', true).trigger('change') : "";
+                    params.value >= 1 ? $('input[name="input-campaign-value"]').val(`${params.value}00`).trigger('change') : "";
+
+                    let local = params.local.split(' - ')
+                    let state = getKeysContainingSubstring(statesCitys, local[1])
+                    let city = local[0]
+
+                    if (local){
+                        $('select[name="input-campaign-state"]').val(state).trigger('change')
+                        $('select[name="input-campaign-city"]').val(city).trigger('change')
+                    }
+                }
+
                 break;
             case 'edit-campaign':
 
@@ -6242,9 +6270,8 @@ function body_modal(ref, params){
                         },
                         dataType: "json",
                         success: function (data) {
-                            // console.log(data)
                             if (data.success){
-                                body_modal('collab', data)
+                                body_modal('campaign', data)
                             }
                         },
                         error: function(data){
@@ -6270,8 +6297,12 @@ function body_modal(ref, params){
                                 <h5>Encerrar sessão?</h5>
                                 <p class="">Ao encerrar a sessão, você não poderá executar ações no sistema</p>
                                 <div class="">
-                                    <button type="button" class="btn btn-sm btn-outline-danger m-1" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-sm btn-primary btn-submit m-1">Continuar</button>
+                                    <button type="button" class="btn btn-danger m-1 label-btn" data-bs-dismiss="modal">
+                                        <i class="bi bi-ban label-btn-icon"></i> Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-info-gradient btn-submit label-btn m-1">
+                                        <i class="bi bi-check-circle label-btn-icon"></i> Sim, encerrar
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -6301,7 +6332,7 @@ function body_modal(ref, params){
                                 </div>
 
                                 <div class="col-md-6 d-grid mb-3">
-                                    <button type="submit" class="btn btn-lg btn-primary btn-submit">Recuperar</button>
+                                    <button type="submit" class="btn btn-lg btn-info-gradient btn-submit">Recuperar</button>
                                 </div>
                                 <div class="col-md-6 d-grid mb-3">
                                     <button type="button" class="btn btn-lg btn-danger" onclick="body_modal('login', {})">Cancelar</button>
@@ -6325,7 +6356,7 @@ function body_modal(ref, params){
                                 </div>
 
                                 <div class="col-md-6 d-grid mb-3">
-                                    <button type="submit" class="btn btn-lg btn-primary btn-submit">Validar Código</button>
+                                    <button type="submit" class="btn btn-lg btn-info-gradient btn-submit">Validar Código</button>
                                 </div>
                                 <div class="col-md-6 d-grid mb-3">
                                     <button type="button" class="btn btn-lg btn-danger" onclick="body_modal('login', {})">Cancelar</button>
@@ -6342,16 +6373,16 @@ function body_modal(ref, params){
                                     <label class="my-1 text-danger">Informe a nova senha de acesso</label>
                                     <div class="input-group input-box mb-3">
                                         <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="password" name="password" maxlength="8" placeholder="password" required>
-                                        <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
+                                        <button type="button" aria-label="button" class="btn btn-danger" onclick="createpassword('password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
                                     <div class="input-group input-box mb-3">
                                         <input type="password" class="form-control form-control-lg" onkeyup="checkPassword()" id="confirm-password" name="confirm-password" maxlength="8" autocomplete="new-password" placeholder="Confirme a senha" required>
-                                        <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('confirm-password',this)" id="button-addon3"><i class="ri-eye-off-line align-middle"></i></button>
+                                        <button type="button" aria-label="button" class="btn btn-danger" onclick="createpassword('confirm-password',this)" id="button-addon3"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6 d-grid mb-3">
-                                    <button type="submit" class="btn btn-lg btn-primary btn-submit">Continuar</button>
+                                    <button type="submit" class="btn btn-lg btn-info-gradient btn-submit">Continuar</button>
                                 </div>
                                 <div class="col-md-6 d-grid mb-3">
                                     <button type="button" class="btn btn-lg btn-danger" onclick="body_modal('login', {})">Cancelar</button>
@@ -6411,10 +6442,10 @@ function body_modal(ref, params){
                                     <div class="input-group input-box mb-3">
                                         <input type="password" class="form-control form-control-lg" id="signin-password" name="password" placeholder="password" required>
                                         <span class="authentication-input-icon"><i class="ri-lock-2-fill text-default fs-15 op-7"></i></span>
-                                        <button type="button" aria-label="button" class="btn btn-light" onclick="createpassword('signin-password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
+                                        <button type="button" aria-label="button" class="btn btn-danger" onclick="createpassword('signin-password',this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                                     </div>
                                     <div class="col-xl-12 d-grid mb-3">
-                                        <button type="submit" class="btn btn-lg btn-primary btn-submit">Entrar</button>
+                                        <button type="submit" class="btn btn-lg btn-info-gradient btn-submit">Entrar</button>
                                     </div>
                                     <hr>
                                     <div class="text-center mb-2"><a href="javascript:void(0);" class="text-danger" onclick="body_modal('password-reset', {page: 'get-email'})">Não lembra a senha?</a></div>
@@ -6526,5 +6557,14 @@ $(document).ready(() => {
     $(".select2").select2({
         placeholder: "Cidades participantes",
     });
+
+    $("#select-local").on('change', function (){
+
+        let el = this;
+        const val = el.value;
+
+        $('form[name="get-city"]').submit()
+
+    })
 
 })

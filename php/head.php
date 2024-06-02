@@ -13,10 +13,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link id="style" href="assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
-    <link href="assets/css/styles.min.css" rel="stylesheet" >
-    <link href="assets/css/icons.css" rel="stylesheet" >
-    <link rel="stylesheet" href="assets/libs/flatpickr/flatpickr.min.css">
-    <link rel="stylesheet" href="assets/libs/@simonwep/pickr/themes/nano.min.css">
+    <link href="/assets/css/styles.min.css" rel="stylesheet" >
+    <link href="/assets/css/icons.css" rel="stylesheet" >
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
@@ -24,8 +22,8 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="assets/js/authentication-main.js"></script>
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/jquery.mask.min.js"></script>
+    <script src="/assets/js/authentication-main.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/jquery.mask.min.js"></script>
 
 </head>

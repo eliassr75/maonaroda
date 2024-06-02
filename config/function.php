@@ -25,33 +25,51 @@ function conn(){
  
 }
 
-function get_all($table, $total=false, $key=null, $value=null) {
+function get_all($table, $total = false, $key = null, $value = null, $join = false, $join_on = false, $join_value = false) {
     $conn = conn();
     if ($conn) {
         try {
-
-            if ($total) {
-                $total = ", (SELECT COUNT(id) from $table) as total";
-            }else{
-                $total=null;
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $table) ||
+                ($join && !preg_match('/^[a-zA-Z0-9_]+$/', $join)) ||
+                ($key && !preg_match('/^[a-zA-Z0-9_]+$/', $key)) ||
+                ($join_on && !preg_match('/^[a-zA-Z0-9_]+$/', $join_on)) ||
+                ($join_value && !preg_match('/^[a-zA-Z0-9_]+$/', $join_value))) {
+                throw new InvalidArgumentException("Nome de tabela ou coluna inválido.");
             }
 
-            $stmt = $conn->prepare("SELECT $table.* $total FROM $table ORDER BY id DESC");
+            $selectTotal = $total ? ", (SELECT COUNT(id) FROM $table) as total" : "";
+            $where = ($key && $value) ? "WHERE $table.$key = :value" : "";
+
+            $joinClause = "";
+            $joinSelect = "";
+            if ($join && $join_on && $join_value) {
+                $joinClause = "JOIN $join ON $join.$join_on = $table.$join_value";
+                $columns = $conn->query("SELECT column_name FROM information_schema.columns WHERE table_name = '$join'")->fetchAll(PDO::FETCH_COLUMN);
+                foreach ($columns as $column) {
+                    $joinSelect .= ", $join.$column AS ${join}_$column";
+                }
+            }
+
+            $sql = "SELECT $table.* $joinSelect $selectTotal FROM $table $joinClause $where ORDER BY $table.id DESC";
+
+            $stmt = $conn->prepare($sql);
+
+            if ($key && $value) {
+                $stmt->bindParam(':value', $value);
+            }
+
             $stmt->execute();
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            if ($rows){
-                return $rows;
-            }else{
-                return [];
-            }
-        } catch (PDOException $e) {
+
+            return $rows ? $rows : [];
+        } catch (PDOException | InvalidArgumentException $e) {
             return ["error" => $e->getMessage()];
         }
     } else {
-        return "Nenhuma campanha encontrada.";
+        return ["error" => "Nenhuma conexão com o banco de dados."];
     }
 }
+
 
 function get_by_id($table, $id) {
     $conn = conn();
@@ -81,8 +99,8 @@ function get_campaign_by_id($id) {
 
     if ($conn) {
         try {
-            $stmt = $conn->prepare("SELECT campaign.*, entity.* FROM campaigns JOIN entity ON entity.id = campaign.entity_id WHERE campaign.id = :id ORDER BY campaign.id DESC");
-            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt = $conn->prepare("SELECT * FROM campaign WHERE id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             $rows = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -99,43 +117,59 @@ function get_campaign_by_id($id) {
     }
 }
 
-function create_campaign($data) {
+function campaign($data=false, $edit=false) {
+
     $conn = conn();
-    
-    if ($conn) {
-        $name = (isset($data["name"]) ? $data["name"] : "");
-        $description = (isset($data["description"]) ? $data["description"] : "");
-        $value = (isset($data["value"]) ? $data["value"] : "");
-        $created_by = (isset($data["created_by"]) ? $data["created_by"] : "");
-        $entity_id = (isset($data["entity_id"]) ? $data["entity_id"] : "");
-        $local = (isset($data["local"]) ? $data["local"] : "");
-        $active = (isset($data["active"]) ? $data["active"] : "");
+    $name = ($data["input-campaign-name"] ?? "");
+    $logo = $data["input-campaign-logo"];
+    $description = ($data["input-campaign-editordata"] ?? "");
+    $value = (str_replace(',', '.', $data["input-campaign-value"]) ?? 0);
 
-        if (empty($name)) {
-            return ["error" => "Nome da campanha é obrigatório."];
-        }
-        if (empty($description)) {
-            return ["error" => "A descrição da campanha é obrigatória."];
-        }
-        if (empty($value)) {
-            return ["error" => "O valor da campanha é obrigatório."];
-        }
-        if (empty($local)) {
-            return ["error" => "O local da campanha é obrigatório."];
+    $campaign_id = $data["campaign_id"];
+    $created_by = $_SESSION['id'];
+    $entity_id = $_SESSION['entity_id'];
+
+    $state = ($data["input-campaign-state"] ?? "");
+    $city = ($data["input-campaign-city"] ?? "");
+    $local = "$city - " . explode(" - ", $state)[1];
+    $active = $data["input-campaign-active"] ? "true" : "false";
+
+    if (empty($name)) {
+        return ["error" => "Nome da campanha é obrigatório.", "code" => 500];
+    }
+    if (empty($description)) {
+        return ["error" => "A descrição da campanha é obrigatória.", "code" => 500];
+    }
+    if (empty($local)) {
+        return ["error" => "O local da campanha é obrigatório.", "code" => 500];
+    }
+
+    try {
+        if (!$edit) {
+            $stmt = $conn->prepare('INSERT INTO campaign (name, description, value, created_by, entity_id, local, active, logo) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (name, entity_id, local)
+            DO UPDATE SET 
+               name = EXCLUDED.name,
+               description = EXCLUDED.description,
+               value = EXCLUDED.value,
+               local = EXCLUDED.local,
+               active = EXCLUDED.active,
+               logo = EXCLUDED.logo,
+               updated = now()
+            RETURNING id;
+            ');
+            $stmt->execute([$name, $description, $value, $created_by, $entity_id, $local, $active, $logo]);
+        }else{
+            $stmt = $conn->prepare('UPDATE campaign SET name=?, description=?, value=?, local=?, active=?, logo=?, updated = now() WHERE id=? RETURNING id;');
+            $stmt->execute([$name, $description, $value, $local, $active, $logo, $campaign_id]);
         }
 
-        try {
-            $stmt = $conn->prepare("INSERT INTO campaign (name, description, value, created_by, entity_id, local, active) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$name, $description, $value, $created_by, $entity_id, $local, $active]);
-            
-            $last_id = $conn->lastInsertId();
-            
-            return ["success" => true, "id" => $last_id];
-        } catch (PDOException $e) {
-            return ["error" => "Falha ao criar campanha: " . $e->getMessage()];
-        }
-    } else {
-        return ["error" => "Falha ao conectar com o banco."];
+        $last_id = $stmt->fetchColumn();
+
+        return ["success" => true, "id" => $last_id, "code" => 200];
+    } catch (PDOException $e) {
+        return ["error" => "Falha ao criar/editar campanha: " . $e->getMessage(), "code" => 500];
     }
 }
 
