@@ -35,7 +35,7 @@ if ($page && $_SESSION["logged"]){
                             <div class="card custom-card item-card border border-5 <?= $campaign['active'] ? "border-primary" : "border-danger" ?>">
                                 <div class="product-grid6 card-body p-0">
                                     <div class="product-image6">
-                                        <a href="product-details.html" class="img-container">
+                                        <a data-bs-toggle="modal" onclick="body_modal('edit-campaign', { id: <?=$campaign['id']?>})" data-bs-target="#modal" class="img-container">
                                             <img class="img-fluid img-container w-100 p-1 rounded-2" src="<?=$campaign['logo'] ?? '/assets/images/logo_lg_default.png'?>" alt="img">
                                         </a>
                                         <div class="icon-container">
@@ -136,7 +136,7 @@ $campaigns = get_all('campaign', true, 'active', 'true', 'entity', 'id', 'entity
                 <div class="card custom-card item-card">
                     <div class="product-grid6 card-body p-0">
                         <div class="product-image6">
-                            <a href="product-details.html" class="img-container">
+                            <a data-bs-toggle="modal" onclick="body_modal('view-campaign', <?= htmlspecialchars(json_encode($campaign, true)) ?>)" data-bs-target="#modal" class="img-container">
                                 <img class="img-fluid img-container w-100 p-3" src="<?=$campaign['logo'] ?? '/assets/images/logo_lg_default.png'?>" alt="img">
                             </a>
                             <div class="icon-container">
