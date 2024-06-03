@@ -51,16 +51,16 @@ function sendMail($para, $assunto, $msg, $url=false, $btn=false)
         //Server settings
         //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
         $mail->isSMTP();                                            //Send using SMTP
-        $mail->Host       = 'email-ssl.com.br';                     //Set the SMTP server to send through
+        $mail->Host       = MAIL_HOST;                     //Set the SMTP server to send through
         $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-        $mail->Username   = 'no-reply@maonaroda.etecsystems.com.br';                     //SMTP username
-        $mail->Password   = 'Dc7yM9yajVa5ST@';                               //SMTP password
+        $mail->Username   = MAIL_USERNAME;                     //SMTP username
+        $mail->Password   = MAIL_PASSWORD;                               //SMTP password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
-        $mail->Port       = 587;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+        $mail->Port       = MAIL_PORT;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
         $mail->CharSet = 'UTF-8';
         //Recipients
-        $mail->setFrom('no-reply@maonaroda.etecsystems.com.br');
+        $mail->setFrom(MAIL_USERNAME);
         //$mail->addAddress('joe@example.net');     //Add a recipient
         $mail->addAddress($para);               //Name is optional
 
