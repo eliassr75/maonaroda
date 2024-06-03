@@ -1,5 +1,4 @@
 <?php
-include('config/function.php');
 
 if ($page && $_SESSION["logged"]){
 
@@ -30,6 +29,7 @@ if ($page && $_SESSION["logged"]){
                             $campaign['admin'] = true;
                             $campaign['created'] = date('d/m/Y H:i', strtotime($campaign['created']));
                             $campaign['updated'] = date('d/m/Y H:i', strtotime($campaign['updated']));
+                            $campaign['value'] = formatarDinheiro($campaign['value']);
 
                             ?>
                             <div class="card custom-card item-card border border-5 <?= $campaign['active'] ? "border-primary" : "border-danger" ?>">
@@ -66,7 +66,7 @@ if ($page && $_SESSION["logged"]){
                                                 <span class="fs-15 me-2"> <i class="bi bi-binoculars"></i> <?=$campaign['views']?></span>
                                                 <span class="fs-15"> <i class="bi bi-globe2"></i> <?=$campaign['local']?></span>
                                             </p>
-                                            <?=$campaign['value'] ? '<p class="mb-0 fs-13 text-primary">' . formatarDinheiro($campaign['value']) . '</p>' : ''?>
+                                            <?=$campaign['value'] ? '<p class="mb-0 fs-13 text-primary">' . $campaign['value'] . '</p>' : ''?>
                                         </div>
                                     </div>
                                 </div>
@@ -119,7 +119,7 @@ $campaigns = get_all('campaign', true, 'active', 'true', 'entity', 'id', 'entity
                             <?php } ?>
                         </select>
                         </form>
-                        <button class="btn btn-lg btn-info-gradient label-btn mt-3 col-md-4" data-bs-toggle="modal" onclick="body_modal('campaign', { form: 'new-campaign'})" data-bs-target="#modal">
+                        <button class="btn btn-info-gradient label-btn mt-3 col-md-4" data-bs-toggle="modal" onclick="body_modal('campaign', { form: 'new-campaign'})" data-bs-target="#modal">
                             <i class="label-btn-icon bi bi-plus-lg"></i> Publicar Campanha
                         </button>
                     </div>
@@ -132,7 +132,13 @@ $campaigns = get_all('campaign', true, 'active', 'true', 'entity', 'id', 'entity
         <div class="row products-main">
             <div class="col-12 col-md-6 col-sm-6 col-lg-6 col-xxl-3 product-each">
 
-                <?php foreach ($campaigns as $campaign) { ?>
+                <?php foreach ($campaigns as $campaign) {
+
+                    $campaign['created'] = date('d/m/Y H:i', strtotime($campaign['created']));
+                    $campaign['updated'] = date('d/m/Y H:i', strtotime($campaign['updated']));
+                    $campaign['value'] = formatarDinheiro($campaign['value']);
+
+                    ?>
                 <div class="card custom-card item-card">
                     <div class="product-grid6 card-body p-0">
                         <div class="product-image6">
@@ -158,7 +164,7 @@ $campaigns = get_all('campaign', true, 'active', 'true', 'entity', 'id', 'entity
                                 <p class="mb-0">
                                     <span class="fs-15"> <i class="bi bi-globe2"></i> <?=$campaign['local']?></span>
                                 </p>
-                                <?=$campaign['value'] ? '<p class="mb-0 fs-13 text-primary">' . formatarDinheiro($campaign['value']) . '</p>' : ''?>
+                                <?=$campaign['value'] ? '<p class="mb-0 fs-13 text-primary">' . $campaign['value'] . '</p>' : ''?>
                             </div>
                         </div>
                     </div>

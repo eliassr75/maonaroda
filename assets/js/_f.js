@@ -5901,7 +5901,7 @@ function body_modal(ref, params){
         let method = ""
         let url_api = ""
 
-        const allowed_mods = ["password-reset", "new-login", "recovery-code"]
+        const allowed_mods = ["password-reset", "new-login", "recovery-code", "view-campaign"]
         
         if (!logged && !allowed_mods.includes(ref)){
             ref = ""
@@ -5916,76 +5916,57 @@ function body_modal(ref, params){
 
                 method = "POST"
                 url_api = api.internal
-                // email, username, password, city, state, country, postcode, gender, phone, ddi_phone, country_phone, document
+
+                console.log(params)
+
                 $(".modal-content").html(`
         
-                <form id="new-user" name="new-user">
-                    <input type="hidden" name="query" value="${params.form}"/>
-                    ${params.form == "edit-user" ? `<input type="hidden" name="user_id" value="${params.id}"/>` : ""}
+                <form id="edit-user" name="edit-user">
+                
+                    <input type="hidden" name="query" value="edit-user"/>
+                    <input type="hidden" name="user_id" value="${params.id}"/>
+                    <input type="hidden" name="entity_id" value="${params.entity_id}"/>
+                    
                     <div class="modal-header">
                         <h6 class="modal-title">
-                            <i class="bi bi-person-add"></i> ${params.form == "edit-user" ? "Editar Usuário":"Novo Usuário"}
+                            <i class="bi bi-person-add"></i> Editar Usuário
                         </h6>
                         <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body text-start">
                         <div class="custom-alert"></div>
+                        
+                        <label>Dados do Usuário</label>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="user-input-name" name="user_name" placeholder="Nome do Usuário" required>
-                            <label for="user-input-name"><i class="bi bi-person"></i> Nome do Usuário</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Nome" required>
+                            <label for="name"><i class="bi bi-person"></i> Nome</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="email" name="email" placeholder="Email" required>
+                            <label for="email"><i class="bi bi-envelope"></i> Email</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Telefone" required>
+                            <label for="phone"><i class="bi bi-phone"></i> Telefone</label>
                         </div>
                         <hr>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="user_gender" id="user-input-gender-1" value="0" required checked>
-                            <label class="form-check-label" for="user-input-gender-1">
-                                Acumulativa
-                            </label>
+                        <label>Dados da Empresa</label>
+                        <div class="form-floating mb-3">
+                            <input readonly type="tel" class="border form-control" id="cnpj" name="cnpj" placeholder="" required>
+                            <label for="cnpj"><i class="ri-home-2-fill text-default fs-15 op-7"></i> CNPJ: 00.000.000/0000-00</label>
                         </div>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="user_gender" id="user-input-gender-2" value="1" required>
-                            <label class="form-check-label" for="user-input-gender-2">
-                                Progressiva
-                            </label>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="border form-control" id="name" name="entity-name" placeholder="" required>
+                            <label for="name"><i class="ri-home-2-fill text-default fs-15 op-7"></i> Razão Social</label>
                         </div>
-                        
-                        <div class="mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text">R$</span>
-                                <div class="form-floating">
-                                    <div class="form-floating">
-                                        <input type="tel" class="form-control br-money" id="collab-input-total-value" name="wallets_value_total" placeholder="Valor total da Collab" readonly value="0">
-                                        <label for="collab-input-total-value">Valor total da Collab</label>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                            <span class="fs-12 text-danger" id="aviso_total"></span>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="border form-control" id="custom-name" name="entity-custom-name" placeholder="" required>
+                            <label for="custom-name"><i class="ri-home-2-fill text-default fs-15 op-7"></i> Nome Fantasia</label>
                         </div>
-                        <div class="form-group my-2">
-                            <label for="wallets_categoria">Categorias da Collab:</label>
-                            <select class="select2-multiple-max-5 form-control" name="wallets_categoria[]" id="wallets_categoria" multiple required>
-                                ${values_select}
-                            </select>
-                        </div>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="wallets_type" id="collab-input-type-public" value="0" required>
-                            <label class="form-check-label" for="collab-input-type-public">
-                                Pública 
-                            </label>
-                        </div>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="wallets_type" id="collab-input-type-private" value="1" required checked>
-                            <label class="form-check-label" for="collab-input-type-private">
-                                Privada
-                            </label>
-                        </div>
-                        <span class="fs-12 text-warning" id="aviso_type">
-                            <i class="bi bi-incognito"></i> Apenas convidados tem acesso.
-                        </span>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-info-gradient label-btn btn-submit">
-                            <i class="bi bi-floppy label-btn-icon"></i> ${params.form == "edit-collab" ? "Salvar":"Adicionar"} 
+                            <i class="bi bi-floppy label-btn-icon"></i> Salvar
                         </button> 
                         <button type="button" class="btn btn-danger label-btn" data-bs-dismiss="modal">
                             <i class="bi bi-ban label-btn-icon"></i> Fechar
@@ -5994,6 +5975,18 @@ function body_modal(ref, params){
                 </form>
                     
                 `)
+
+                params.name ? $('input[name="name"]').val(params.name).trigger('change') : "";
+                params.email ? $('input[name="email"]').val(params.email).trigger('change') : "";
+                params.phone ? $('input[name="phone"]').val(params.phone).trigger('change') : $('input[name="phone"]').val(params.entity_phone_number).trigger('change');
+
+                params.entity_cnpj ? $('input[name="cnpj"]').val(params.entity_cnpj).trigger('change') : "";
+                params.entity_name ? $('input[name="entity-name"]').val(params.entity_name).trigger('change') : "";
+                params.entity_custom_name ? $('input[name="entity-custom-name"]').val(params.entity_custom_name).trigger('change') : "";
+
+                $('#cnpj').mask("00.000.000/0000-00")
+                $('#phone').mask("(00) 00000-0000")
+
                 break;
             case 'new-login':
 
@@ -6064,7 +6057,73 @@ function body_modal(ref, params){
 
                 console.log(params)
 
-                $(".modal-content").html(``)
+                if(params.admin){
+                    params.admin = `
+                    
+                    <a class="me-0 d-flex" href="javascript:void(0);">
+                        <span class="bi bi-binoculars text-muted me-2 text-17"></span>
+                        <div class="mt-0 text-muted">${params.views} ${params.views > 1 ? `Visualizações` : `Visualização`}</div>
+                    </a>
+                    
+                    `
+                }
+
+                const phone_number = params.phone ?? params.entity_phone_number;
+
+                $(".modal-content").html(`
+                
+                <div class="modal-header">
+                        <h6 class="modal-title">
+                            <i class="bi bi-newspaper"></i> ${params.name}
+                        </h6>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-start">
+                        <div class="custom-alert"></div>
+                        
+                        <div class="card custom-card overflow-hidden">
+                            <img src="${params.logo}" alt="" class="background-image-blog rounded-2 mb-0"/>
+                            <div class="card-body">
+                                <a href="javascript:void(0);" class="blog-title mb-2">${params.name}</a>
+                                ${params.value ? `<p class="mb-0 fs-13 text-primary">${params.value}</p>` : ""}
+                                ${params.local ? `<p class="mb-0 fs-13 text-muted"><i class="bi bi-globe2"></i> ${params.local}</p>` : ""}
+                                <hr>
+                                <div class="mb-0 mt-3">
+                                    ${params.description}
+                                </div>
+                                    <!--<a href="blog-details.html" class="btn btn-outline-primary mt-2">Read More</a>-->
+                            </div>
+                            <div class="card-footer p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar-list indicators">
+                                        <a aria-label="anchor" href="javascript:void(0);" class="avatar avatar-md avatar-rounded">
+                                            <img src="/assets/images/companhia.png" alt="">
+                                        </a>                                            
+                                        
+                                    </div>
+                                    <h6 class="mb-0 text-muted ms-sm-2 mt-sm-0 mt-2">${params.entity_custom_name ? params.entity_custom_name : params.entity_name}</h6>
+                                </div>
+                                <div class="d-sm-flex ms-sm-auto">
+                                    <a href="javascript:void(0);" class="d-flex me-3">
+                                        <span class="fe fe-calendar text-muted me-2 text-17"></span>
+                                        <div class="mt-0 text-muted">${params.created}</div>
+                                    </a>
+                                    <a href="https://api.whatsapp.com/send?phone=55${phone_number.replace(' ', '').replace('(', '').replace(')', '').replace('-', '')}" target="_blank" class="d-flex me-3">
+                                        <span class="bi bi-whatsapp text-primary me-2 text-17"></span>
+                                        <div class="mt-0 text-decoration-underline">${phone_number}</div>
+                                    </a>
+                                    ${params.admin ? params.admin : ""}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger label-btn" data-bs-dismiss="modal">
+                            <i class="bi bi-ban label-btn-icon"></i> Fechar
+                        </button>
+                    </div>
+                
+                `)
 
                 break;
             case 'campaign':

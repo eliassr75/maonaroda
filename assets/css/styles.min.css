@@ -21224,10 +21224,6 @@ code[class*="language-"] {
     background-repeat: no-repeat !important;
     position: relative;
 }
-.background-image-blog.img1 {
-    background-image: url(../images/photos/blog8.jpg);
-    height: 320px;
-}
 .background-image-blog.img2 {
     background-image: url(../images/photos/blog12.jpg) !important;
     background-position: top !important;

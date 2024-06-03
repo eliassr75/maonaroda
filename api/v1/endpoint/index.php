@@ -361,6 +361,19 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $code = false;
                 
                 switch($_POST["query"]){
+                    case 'edit-user':
+
+                        $msg = update_user($_POST);
+                        if($msg['error']){
+                            $code = 500;
+                        }else{
+                            $code = $msg['code'];
+                            $msg['success'] = true;
+                            $msg['msg'] = "Usuário atualizado com sucesso!";
+                            $msg['reload'] = true;
+                        }
+
+                        break;
                     case 'edit-campaign':
 
                         if(isset($_FILES["input-campaign-logo"]["name"])) {

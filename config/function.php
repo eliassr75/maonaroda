@@ -70,6 +70,47 @@ function get_all($table, $total = false, $key = null, $value = null, $join = fal
     }
 }
 
+function update_user($data)
+{
+
+    $user_id = $data['user_id'];
+    $entity_id = $data['entity_id'];
+
+    $user_name = $data['name'];
+    $user_email = $data['email'];
+    $user_phone = $data['phone'];
+
+    $entity_custom_name = $data['entity-custom-name'];
+    $entity_name = $data['entity-name'];
+
+    try{
+
+        $conn = conn();
+
+        $stmt = $conn->prepare("SELECT * FROM users where email=? and id != ?");
+        $stmt->execute([$user_email, $_SESSION['id']]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if(!$rows) {
+
+            $stmt = $conn->prepare('UPDATE users SET name=?, email=?, phone=? where id=?');
+            $stmt->execute([$user_name, $user_email, $user_phone, $user_id]);
+
+            $stmt = $conn->prepare('UPDATE entity SET name=?, custom_name=?, phone_number=? where id=?');
+            $stmt->execute([$entity_name, $entity_custom_name, $user_phone, $entity_id]);
+
+            $_SESSION['name'] = $user_name;
+            $_SESSION['email'] = $user_email;
+            $_SESSION['phone'] = $user_phone;
+            return ["code" => 200, "success" => true];
+        }else{
+            return ["error" => "Por favor, escolha outro email.", "code" => 500];
+        }
+
+    }catch (Exception $e){
+        return ["error" => $e->getMessage(), "code" => 500];
+    }
+}
 
 function get_by_id($table, $id) {
     $conn = conn();

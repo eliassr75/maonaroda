@@ -42,9 +42,15 @@
             </a>
             <!-- End::header-link|dropdown-toggle -->
             <ul class="main-header-dropdown dropdown-menu pt-0 overflow-hidden header-profile-dropdown dropdown-menu-end" aria-labelledby="mainHeaderProfile">
-                <?php if($_SESSION['logged']){ ?>
+                <?php if($_SESSION['logged']){
+
+
+                    $user = get_all('users', false, "id", $_SESSION['id'], 'entity', 'id', 'entity_id');
+                    $user = $user[0];
+
+                    ?>
                     <li>
-                        <a class="dropdown-item dropdown-hover d-flex" data-bs-toggle="modal" onclick="body_modal('user')" href="#modal">
+                        <a class="dropdown-item dropdown-hover d-flex" data-bs-toggle="modal" onclick="body_modal('user', <?= htmlspecialchars(json_encode($user, true)) ?>)" href="#modal">
                             <i class="bi bi-person me-2"></i> Perfil
                         </a>
                     </li>

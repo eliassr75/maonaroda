@@ -1,6 +1,7 @@
 <?php 
 
-session_start(); 
+session_start();
+include('config/function.php');
 $page = (isset($_GET['p']) && !empty($_GET['p']) ? strtolower($_GET['p']) : false );
 
 ?>
