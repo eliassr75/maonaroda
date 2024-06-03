@@ -1,6 +1,8 @@
 <?php
+$parsed = parse_ini_file('settings.env', true);
+
 // Configuração do banco de dados
-define("DB_HOST", "maonaroda.postgresql.dbaas.com.br");
-define("DB_USER", "maonaroda");
-define("DB_PASSWORD", "Dc7yM9yajVa5S@");
-define("DB_NAME", "maonaroda");
+define("DB_HOST", $parsed['DB_HOST']);
+define("DB_USER", $parsed['DB_USER']);
+define("DB_PASSWORD", $parsed['DB_PASSWORD']);
+define("DB_NAME", $parsed['DB_NAME']);
