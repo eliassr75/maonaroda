@@ -1,20 +1,15 @@
 <?php
 
+session_start();
+
 require __DIR__ . '/vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 require_once("../../../config/cors.php");
+require_once("../../../config/database.php");
 require_once("../../../config/function.php");
-
-/*
-
-RewriteEngine On
-RewriteCond %{SERVER_PORT} 80
-RewriteRule ^(.*)$ https://www.maonaroda.etecsystems.com.br/$1 [R,L]
-
-*/
 
 function sendMail($para, $assunto, $msg, $url=false, $btn=false)
 {
@@ -185,32 +180,12 @@ function sendMail($para, $assunto, $msg, $url=false, $btn=false)
     }
 }
 
-function auto_decimal_format($n, $def = 2) {
-    
-    $a = explode(".", $n);
-    if (count($a)>1) {
-        $b = str_split($a[1]);
-        $pos = 1;
-        foreach ($b as $value) {
-            if ($value != 0 && $pos >= $def) {
-                $c = number_format($n, $pos);
-                $c_len = strlen(substr(strrchr($c, "."), 1));
-                if ($c_len > $def) { return rtrim($c, 0); }
-                return $c; // or break
-            }
-            $pos++;
-        }
-    }
-    return number_format($n, $def);
-}
-
-
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
     $msg = ["error" => "Nenhum parâmetro informado."];
     $code =  404;
 
-    if (isset($_GET["query"]) && !empty($_GET["query"])){
+    if (!empty($_GET["query"])){
     
         $QUERY = $_GET["query"];
         switch($QUERY){
@@ -263,7 +238,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                         $code = intval($_GET['code']);
                         $session_code = intval($_SESSION['recovery-code']);
 
-                        if($code === $session_code){
+                        if($code == $session_code){
                             $msg['page'] = "new-password";
                             $msg['msg'] = "Código validado! Agora vamos definir a nova senha.";
                             $msg['recovery'] = true;
@@ -271,7 +246,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                             $msg['error'] = null;
                             $code = 200;
                         }else{
-                            $msg['error'] = "Código inválido!";
+                            $msg['error'] = "Código inválido! - $code - $session_code";
                             $code = 500;
                         }
 
@@ -332,9 +307,6 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 }
                 break;
             default:
-                
-
-                
                 break;
         }
         
@@ -343,17 +315,15 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     http_response_code($code);
     echo json_encode($msg, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     
-    
-    
 }
 elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $msg = ["error" => "Nenhum parâmetro informado."];
+    $msg = ["error" => "Nenhum parâmetro informado." . print_r($_POST, true)];
     $code = 404;
 
-    if (isset($_POST["query"]) && !empty($_POST["query"])){
+    if (!empty($_POST["query"])){
                 
-        if(isset($_SESSION["password"]) && !empty($_SESSION["password"])){
+        if(!empty($_SESSION['id'])){
             
             $email = $_SESSION["email"];
             $user = validarEmail($email);
@@ -450,15 +420,15 @@ elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
                 }
             
             }else{
-                $msg["error"] = "O token informado é inválido!";
+                $msg["error"] = "O email autenticado é inválido!";
             }
             
         }else{
+
             switch($_POST["query"]){
-                case 'password-reset':
+                case "password-reset":
 
                     $sub_query = $_POST["sub-query"];
-
                     if ($sub_query == "new-password") {
                         try {
 

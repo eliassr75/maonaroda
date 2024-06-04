@@ -297,7 +297,6 @@ function validarEmail($email) {
             return $row;
         } else {
             // Token não encontrado, retornar falso
-            session_destroy();
             return false;
         }
     } catch (PDOException $e) {

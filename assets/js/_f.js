@@ -6539,10 +6539,12 @@ function body_modal(ref, params){
             $('.btn-submit').prop('disabled', true);
 
             if (method == "POST"){
-                var formdata = new FormData($(`form`)[0]);
+                var formdata = new FormData(this);
             }else{
                 var formdata = $(`form`).serialize();
             }
+
+            console.log(method, params)
         
             $.ajax({
                 type: method,
@@ -6550,6 +6552,7 @@ function body_modal(ref, params){
                 data: formdata,
                 processData: false,
                 contentType: false,
+                cache: false,
                 dataType: 'json',
                 success: function(data) {
                 
