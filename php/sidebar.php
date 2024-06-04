@@ -42,7 +42,7 @@
             </a>
             <!-- End::header-link|dropdown-toggle -->
             <ul class="main-header-dropdown dropdown-menu pt-0 overflow-hidden header-profile-dropdown dropdown-menu-end" aria-labelledby="mainHeaderProfile">
-                <?php if($_SESSION['logged']){
+                <?php if(isset($_SESSION['id']) && isset($_SESSION['logged'])){
 
 
                     $user = get_all('users', false, "id", $_SESSION['id'], 'entity', 'id', 'entity_id');

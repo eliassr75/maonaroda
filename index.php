@@ -1,4 +1,9 @@
-<?php 
+<?php
+
+header("Expires: Thu, 19 Nov 1981 08:52:00 GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
 session_start();
 include('config/function.php');
